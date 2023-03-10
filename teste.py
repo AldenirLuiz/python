@@ -14,16 +14,24 @@ vendNames = ["Jeronimo", "Corro", "Alex"]
 
 def ger_banco(data: dict):
     print(data)
-    table_name = f"{data.get('nome da rota')}{data.get('data da rota')}"
+    table_name = f"{data.get('nome da rota')}"
     print(table_name)
     try:
-        cursor.execute(f"CREATE TABLE {table_name} {tuple(data.keys())}")
+        if not verify_tables(table_name):
+            cursor.execute(f"CREATE TABLE {table_name} {tuple(data.keys())}")
         cursor.execute(f"INSERT INTO {table_name} VALUES{tuple(data.values())}")
         conn.commit()
     except Error as erro:
         print(erro)
         cursor.execute(f"INSERT INTO {table_name} VALUES{tuple(data.values())}")
         conn.commit()
+
+def verify_tables(_table: str) -> bool:
+        _query_check = cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{_table}';").fetchall()
+        if _query_check != list():
+            return True
+        else:
+            return False
 
 
 def dict_dados():

@@ -135,7 +135,7 @@ class ContainerView(MainWindow):
     def combo_command(self, event):
         print(f"texto: {self.text_tables.get()}\nEvento: {event}")
 
-        
+
 
 if __name__ == "__main__":
     ContainerView()

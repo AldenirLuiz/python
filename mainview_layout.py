@@ -1,22 +1,19 @@
 from tkinter import *
 from tkinter import ttk
+import dataHandler
 
 class MainView:
+    db = dataHandler.HandlerDB()
     list_type_users = ['Usuario', 'Administrador', 'Vendedor']
     list_header = ['Nome', 'Telefone', 'Email', 'Cargo']
     descritive_font = ('arial', 22)
     secondary_font = ('arial', 14)
     other_font = ('arial', 12)
     message_user = """
-        Please note, this is a tool for manage Users, dont use for add. products
+        This is a tool for manage and add Users, dont use for add products!
         and note: the type of user field atempt to add user type and this afect 
         permission of user on the system
     """
-    users = {
-        'Jeronimo': 'Vendedor',
-        'Aldenir': 'Administrador',
-        'Francisco': 'Gerente',
-    }
 
     def __init__(self):
         self.frm_view = Tk()
@@ -153,7 +150,7 @@ class MainView:
             'btt_data_clear': 
                 Button(
                     self.containers_colunas_primarias['linha00_coluna01'],
-                    text='Limpar', bg='orange'
+                    text='Limpar', bg='orange', command=lambda: self.clear_fields()
                 ),
         }
         
@@ -203,9 +200,18 @@ class MainView:
                     'btt_exit': 
                         self.frame_inferior_Direito['btt_exit']}],
             direction='top',
-            expand=1
-    )
+            expand=1)
+        self.data_view_update()
         self.frm_view.mainloop()
+
+        
+    def data_view_update(self):
+        for iten in self.frame_superior_esquerdo['text_box'].selection():
+            print(iten)
+            self.frame_superior_esquerdo['text_box'].delete(iten)
+
+        for value in self.db.request_data('users'):
+            self.frame_superior_esquerdo['text_box'].insert('', 'end', values=value)
 
     def pack_Widgets(self, **kwargs):
         _widgets: list[dict[str: Widget]] = kwargs.get('widgets')
@@ -244,9 +250,15 @@ class MainView:
                 self.frame_superior_Direito[_entry], ttk.Combobox):
                 _value.update(
                     {_entry: self.frame_superior_Direito[_entry].get()})
-        print(_value)
-        self.frame_superior_esquerdo['text_box'].insert('', 'end', values=list(_value.values()))
-        return _value
+        self.db.query_add(_value, 'users')
+        self.data_view_update()
+
+    def clear_fields(self):
+        for _entry in self.frame_superior_Direito.keys():
+            if isinstance(
+                self.frame_superior_Direito[_entry], Entry) or isinstance(
+                self.frame_superior_Direito[_entry], ttk.Combobox):
+                self.frame_superior_Direito[_entry].delete(0, END)
 
 
 

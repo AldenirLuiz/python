@@ -26,19 +26,21 @@ class HandlerDB:
             print(message)
             self.ErrConnectDB(message)
 
-    def query_add(self, _data: dict[str, str]) -> str:
-        _table_: str = f"{_data['nome da rota']}{_data['data da rota']}"
-        temp_table_create: str = f"CREATE TABLE {_table_} {tuple(_data.keys())};"
-        temp_data_adict: str = f"INSERT INTO {_table_} VALUES{tuple(_data.values())};"
-
+    def query_add(self, _data: dict[str, str], _table:str=None, contiguos:bool=False) -> str:
+        if not _table:
+            _table_: str = f"{_data['nome da rota']}{_data['data da rota']}"
+        else:
+            _table_ = _table
+        
         if not self.verify_tables(_table=_table_):
+            temp_table_create: str = f"CREATE TABLE {_table_} {tuple(_data.keys())};"
             self.cursor.execute(temp_table_create)
             self.banco.commit()
-            self.cursor.execute(temp_data_adict)
-            self.banco.commit()
-            return "All data are aded"
-        else:
-            return f"A tabela {_table_} ja existe no banco de dados!"
+        temp_data_adict: str = f"INSERT INTO {_table_} VALUES{tuple(_data.values())};"
+
+        self.cursor.execute(temp_data_adict)
+        self.banco.commit()
+        return "All data are aded"
 
     def query_request_tables(self) -> list:
 
@@ -74,6 +76,9 @@ class HandlerDB:
             return True
         else:
             return False
+        
+    def request_data_from(self, _table, _where:dict, _limit:int=None):
+        pass
 
     @staticmethod
     def format_table_names(_tables: list[str, str]):
@@ -97,9 +102,18 @@ class HandlerDB:
 
 if __name__ == "__main__":
     hand = HandlerDB()
+
+    def request_users():
+        count = 0
+        for user in hand.request_data('users'):
+            print(user)
+            hand.cursor.execute(f"DROP TABLE IF EXISTS users")
+            count+=1
+    
+    request_users()
     # print(hand.verify_tables('Itaporanga28_2_2023'))
-    tables: list[str] = hand.query_request_tables()
-    print(hand.format_table_names(tables))
+    #tables: list[str] = hand.query_request_tables()
+    #print(hand.format_table_names(tables))
     # print(tables)
     # print(hand.query_request_tables(_table=tables[0]))
     # print(hand.query_request_columns(tables[0]))
