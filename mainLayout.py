@@ -36,7 +36,7 @@ class Layout:
 
     # cria o card a receber os widgets
     @staticmethod
-    def creat_card(pai: Widget, desc: str):
+    def create_card(pai: Widget, desc: str):
         # container de disposicao da grade frm0
         label = Label(pai, text=desc.upper(), relief='groove')
         label.pack(expand=1, fill='x')
@@ -66,15 +66,14 @@ class Layout:
         desc: str = None,
         subwidget=None,
         data: dict = None,
-        font=None
-    ) -> dict:
+        font=None ) -> dict:
 
         data_frames: dict = data
             
         #  percorre as celulas presentes no pacote
         for desc, celula in celulas.items():
             frm0 = Frame(pai, relief='groove', bd=2)
-            Layout.creat_card(frm0, desc)
+            Layout.create_card(frm0, desc)
             # percorre os widgets presentes no pacote
             for widget in celula:
                 # removendo caracteres desnecessarios

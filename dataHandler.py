@@ -11,6 +11,8 @@ class HandlerDB:
     _query_table_check: str = "SELECT name FROM sqlite_master WHERE type='table' AND name='{}';"
     _temp_query_columns: str = "PRAGMA table_info({})"
     _request_data_from: str = "SELECT * FROM '{}'"
+    _request_from: str = "SELECT '{}', '{}' FROM '{}' WHERE '{}'='{}';"
+
     _error_code_table: str = "Tabela Inexistente"
 
     def __init__(self) -> None:
@@ -69,6 +71,11 @@ class HandlerDB:
             return _data
         else:
             return ['Table not exists', _table]
+        
+    def request_data_from(self, *args):
+        _data = self.cursor.execute(self._request_from.format(*args)).fetchall()
+        return _data
+        
 
     def verify_tables(self, _table: str) -> bool:
         _query_check = self.cursor.execute(self._query_table_check.format(_table)).fetchall()
@@ -77,9 +84,6 @@ class HandlerDB:
         else:
             return False
         
-    def request_data_from(self, _table, _where:dict, _limit:int=None):
-        pass
-
     @staticmethod
     def format_table_names(_tables: list[str, str]):
         temp_names = list()
@@ -107,10 +111,10 @@ if __name__ == "__main__":
         count = 0
         for user in hand.request_data('users'):
             print(user)
-            hand.cursor.execute(f"DROP TABLE IF EXISTS users")
+            #hand.cursor.execute(f"DROP TABLE IF EXISTS users")
             count+=1
     
-    request_users()
+    #request_users()
     # print(hand.verify_tables('Itaporanga28_2_2023'))
     #tables: list[str] = hand.query_request_tables()
     #print(hand.format_table_names(tables))
@@ -119,3 +123,4 @@ if __name__ == "__main__":
     # print(hand.query_request_columns(tables[0]))
     # dictdata = dict(zip(hand.query_request_columns(tables[0]), hand.request_data(tables[0])[0]))
     # print(dictdata)
+    print(hand.request_data_from('nome da rota', 'data da rota', 'Campina', 'nome do vendedor', 'Alex'))

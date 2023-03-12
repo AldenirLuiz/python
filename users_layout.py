@@ -15,9 +15,9 @@ class MainView:
         permission of user on the system
     """
 
-    def __init__(self):
-        self.frm_view = Tk()
-        self.top_level_frm_00 = Frame(self.frm_view)
+    def __init__(self, master:Toplevel):
+        master.geometry('900x660')
+        self.top_level_frm_00 = Frame(master)
         self.top_level_frm_00.pack(
             expand=1, fill='both', padx=8, pady=8, ipadx=8, ipady=8
         )
@@ -202,7 +202,7 @@ class MainView:
             direction='top',
             expand=1)
         self.data_view_update()
-        self.frm_view.mainloop()
+        # self.frm_view.mainloop()
 
         
     def data_view_update(self):
