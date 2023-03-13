@@ -3,7 +3,7 @@ from tkinter import ttk
 import dataHandler
 
 class MainView:
-    db = dataHandler.HandlerDB()
+    db = dataHandler.HandlerDB(_database='users')
     list_type_users = ['Usuario', 'Administrador', 'Vendedor']
     list_header = ['Nome', 'Telefone', 'Email', 'Cargo']
     descritive_font = ('arial', 22)
@@ -251,6 +251,7 @@ class MainView:
                 _value.update(
                     {_entry: self.frame_superior_Direito[_entry].get()})
         self.db.query_add(_value, 'users')
+        _value = dict()
         self.data_view_update()
 
     def clear_fields(self):
@@ -263,4 +264,7 @@ class MainView:
 
 
 if __name__ == "__main__":
-    MainView()
+    window = Tk()
+    MainView(window)
+    window.mainloop()
+    

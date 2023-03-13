@@ -7,24 +7,25 @@ from clockWise import MyClock
 from users_layout import MainView as Users
 from main_menu import MainMenu
 from my_treeview import MyTable
+from table_frame import TableFrame
 
 class NewView:
-    _handler = Db()
+    _handler_db_users = Db(_database='users')
+    _handler_db_data = Db(_database='data')
     cards = ViewCard.layers
     list_headers = ['Rota', 'Data', 'Retorno']
     def __init__(self) -> None:
         self.window = Tk()
         
-        self._names = dict(zip(
-            self._handler.query_request_columns('users'), 
-            self._handler.request_data('users')[0],
-        ))
+        self._names = list(self.request_data_users().keys())
+        self._routes = list()
+
         self.text_tables_routes = StringVar(self.window)
         self.text_tables_vendor = StringVar(self.window)
         
         self.menu_names = {
             'Gerenciamento': {
-                'Configuracoes': lambda:print('configuracoes'), 
+                'Configuracoes': lambda:self.create_view('Campina'), 
                 'Users': lambda:Users(Toplevel())
             },
         }
@@ -63,17 +64,31 @@ class NewView:
         self.label_desc_route = Label(self.frm_rw00_cln00, text='Vendedor:', font=('arial', 14))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         
+        self.combo_selection = {
+            'nome_do_vendedor':self.text_tables_vendor.get(),
+            'nome_da_rota':self.text_tables_vendor.get(),
+        }
+        self.combo_values = self.fill_combo()
         self.combo_vendors = ttk.Combobox( # Combobox Vendedores
-            self.frm_rw00_cln00, textvariable=self.text_tables_routes, 
-            values=self._names['user_name_entry'])
+            self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
+            values=self.combo_values)
+        self.combo_vendors.bind(
+            "<<ComboboxSelected>>", 
+            lambda e, x='nome_do_vendedor': self.vendor_combo_comand(x, self.text_tables_vendor.get())
+        )
         self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
         
         self.label_desc_vendor = Label(self.frm_rw00_cln00, text='Rota:', font=('arial', 14))
         self.label_desc_vendor.pack(side='left', padx=4, ipadx=4)
-
+        
         self.combo_routes = ttk.Combobox( # Combobox Rotas
-            self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
-            values=self._handler.query_request_tables())
+            self.frm_rw00_cln00, textvariable=self.text_tables_routes, 
+            values=self._routes,
+            exportselection=True)
+        self.combo_routes.bind(
+            "<<ComboboxSelected>>", 
+            lambda e: self.treeview_data(self.text_tables_routes.get())
+        )
         self.combo_routes.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
         
         self.main_table = MyTable(
@@ -81,52 +96,97 @@ class NewView:
             _columns=self.list_headers,
             _width=120,
         ).build_view()
+        self.main_table.bind("<Double-1>", self.treeview_clicked)
 
-        # self.create_view('Campina_23_6_2023')
         self.table_frame = Frame(self.frm_rw00_cln01)
+        self.create_view()
         self.table_frame.pack()
         self.window.mainloop()
 
+    def vendor_combo_comand(self, event, _var):
+        self.combo_selection[event] = _var
+        self.request_tree(self.text_tables_vendor.get())
 
-    def command(self):
-        print('hello')
+    def request_tree(self, vendor:str):
+        data:dict = self._handler_db_data.request_from_vendor(vendor)
+        self.combo_routes.delete(0, END)
+        self.combo_routes.config(values=list(data.keys()))
+        return data
+    
+    def fill_combo(self):
+        temp=str()
+        if temp := self._names :
+            temp = self._names
+            return temp
+        return ["Nenhum Usuario"] 
 
     def request_table_names(self, _user=None, _route=None) -> dict:
         """requisitando e formatando os nomes das tableas existentes
         <:return dict column|data"""
 
-        _table_names: list = self._handler.query_request_tables()
-        _format_tables: list = self._handler.format_table_names(_table_names)
+        _table_names: list = self._handler_db_data.query_request_tables()
+        _format_tables: list = self._handler_db_data.format_table_names(_table_names)
 
         dict_table = dict(zip(  # empacotando os dados em chaves:valores
             _table_names, _format_tables))
         return dict_table
         
-
-    def create_view(self, _table=None):
+    def create_view(self):
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
+        self.view = TableFrame(self.table_frame, self.cards)
+        self.table_frame.pack()
+    
+    def request_data(self, _table):
+        my_table = _table
+        data_table: dict = dict(zip(
+                self._handler_db_data.query_request_columns(my_table), 
+                self._handler_db_data.request_data(my_table)[0]
+            )
+        )
+        return  data_table
+    
+    def treeview_data(self, table):
+        tree_data = list()
+        vendor:str = self.text_tables_vendor.get()
+        data = self._handler_db_data.request_from_vendor(vendor, table)
+        for _iten in self.main_table.get_children():
+            self.main_table.delete(_iten)
+        for result in data.keys():
+            for value in data[result]:
+                str_date = value[1].replace('_', '/')
+                str_date_return = value[3].replace('_', '/')
+                self.main_table.insert('', 'end', values=[value[0], str_date, str_date_return])
+                tree_data.append([value[0], str_date, str_date_return])
+        return tree_data
 
-        if _table:
-            _data_table = self.request_data(_table)
-        else:
-            _data_table = None
-        
-        for card in self.cards.keys():
-            if card != 'celNomesL4':
-                row = Frame(self.table_frame)
-                Lay.creat_lay(row, self.cards[card], 'label', font=('arial', 8))
-                row.pack(expand=1, fill='both')
-            else:
-                row = Frame(self.table_frame)
-                frm_btt = Frame(row)
-                btt_add = Button(frm_btt, text='Adicionar')
-                btt_print = Button(row, text='Imprimir')
-                btt_add.pack(side='left')
-                btt_print.pack(side='right')
 
-                Lay.creat_lay(row, self.cards[card], 'label', font=('arial', 8), subwidget=frm_btt)
-                row.pack(expand=1, fill='both')
+    def request_data_users(self,):
+        dictdata = dict()
+        tables: list[str] = self._handler_db_users.query_request_tables()
+        columns = self._handler_db_users.query_request_columns(tables[0])
+        data = self._handler_db_users.request_data(tables[0])
+    
+        for _data in data:
+            tempdata = dict(zip(columns, _data))
+            dictdata.update({f"{tempdata['user_name_entry']}": tempdata})
+
+        return dictdata
+
+    def treeview_clicked(self, event):
+        item = self.main_table.selection()[0]
+        values = self.main_table.item(item, 'values')
+        data = self._handler_db_data.request_data_from_column(
+            values[1].replace('/','_'),
+            values[2].replace('/','_'),
+            values[0]
+        )
+        columns = self._handler_db_data.query_request_columns(values[0])
+        _dict_data = dict(zip(columns, data[0]))
+        print(f"dictData: {_dict_data}")
+        self.table_frame.destroy()
+        self.table_frame = Frame(self.frm_rw00_cln01)
+        self.view = TableFrame(self.table_frame, self.cards, _data=_dict_data)
         self.table_frame.pack()
 
 

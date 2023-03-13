@@ -5,20 +5,27 @@ import os
 
 class HandlerDB:
     __ROOT_DIR__: str = os.path.abspath(os.path.dirname(__file__))
-    __DATABASE__: str = 'dadosCobranca.db'
+    __DATABASE_DATA__: str = 'dadosCobranca.db'
+    __DATABASE_USERS__: str = 'userData.db'
 
     _query_table_exists: str = "SELECT name FROM sqlite_master WHERE type='table';"
     _query_table_check: str = "SELECT name FROM sqlite_master WHERE type='table' AND name='{}';"
     _temp_query_columns: str = "PRAGMA table_info({})"
     _request_data_from: str = "SELECT * FROM '{}'"
-    _request_from: str = "SELECT '{}', '{}' FROM '{}' WHERE '{}'='{}';"
+    _request_from: str = "SELECT * FROM '{}' WHERE nome_do_vendedor=?;"
+    _request_from_vendor:str = "SELECT * FROM {} WHERE nome_do_vendedor=?;"
+    _request_data_with:str = "SELECT * FROM '{}' WHERE data_da_rota LIKE ? AND data_para_retorno=?"
 
     _error_code_table: str = "Tabela Inexistente"
 
-    def __init__(self) -> None:
+    def __init__(self, _database:str='users') -> None:
+        if _database == 'users':
+            self.database = self.__DATABASE_USERS__
+        else:
+            self.database = self.__DATABASE_DATA__
         try:
             self.banco: Connection = db.connect(
-                f'{self.__ROOT_DIR__}/dataBase/{self.__DATABASE__}')
+                f'{self.__ROOT_DIR__}/dataBase/{self.database}')
             self.cursor: Cursor = self.banco.cursor()
         except OperationalError as _erro:
             message: str = f"""Problema ao Conectar com o Banco de dados.\n
@@ -30,7 +37,7 @@ class HandlerDB:
 
     def query_add(self, _data: dict[str, str], _table:str=None, contiguos:bool=False) -> str:
         if not _table:
-            _table_: str = f"{_data['nome da rota']}{_data['data da rota']}"
+            _table_: str = f"{_data['nome_da_rota']}{_data['data_da_rota']}"
         else:
             _table_ = _table
         
@@ -48,6 +55,7 @@ class HandlerDB:
 
         try:
             _tables = self.cursor.execute(self._query_table_exists).fetchall()
+            # print(_tables)
             return [x[0] for x in _tables]
         except db.Error as _erro:
             raise _erro
@@ -75,10 +83,35 @@ class HandlerDB:
     def request_data_from(self, *args):
         _data = self.cursor.execute(self._request_from.format(*args)).fetchall()
         return _data
+    
+    def request_data_from_column(self, _column0, _column1, _table):
+        _data = self.cursor.execute(
+            self._request_data_with.format(_table), (_column0, _column1,)
+        ).fetchall()
+        return _data
+
+    def request_from_vendor(self, vendor, table=None):
+        # print(self.cursor.execute("PRAGMA table_info('Campina')").fetchall())
+        
+        data_request = dict()
+        if table:
+            _data = self.cursor.execute(self._request_from_vendor.format(table), (vendor,)).fetchall()
+            if _data != []:
+                temp_data = {table: _data}
+                data_request.update(temp_data)
+        else:
+            for _table in self.query_request_tables():
+                _data = self.cursor.execute(self._request_from_vendor.format(_table), (vendor,)).fetchall()
+                if _data != []:
+                    temp_data = {_table: _data}
+                    data_request.update(temp_data)
+        return data_request
         
 
     def verify_tables(self, _table: str) -> bool:
+        print(_table)
         _query_check = self.cursor.execute(self._query_table_check.format(_table)).fetchall()
+        # print(f"query_check: {_query_check}")
         if _query_check != list():
             return True
         else:
@@ -105,22 +138,37 @@ class HandlerDB:
 
 
 if __name__ == "__main__":
-    hand = HandlerDB()
+    hand_data = HandlerDB(_database='data')
+    hand_users = HandlerDB(_database='users')
 
     def request_users():
         count = 0
-        for user in hand.request_data('users'):
+        for user in hand_users.request_data('users'):
             print(user)
             #hand.cursor.execute(f"DROP TABLE IF EXISTS users")
             count+=1
     
-    #request_users()
-    # print(hand.verify_tables('Itaporanga28_2_2023'))
-    #tables: list[str] = hand.query_request_tables()
-    #print(hand.format_table_names(tables))
+    # print(f"Dados da tabela: {hand_data.request_from_vendor(vendor='Jeronimo', table='Brejo')}")
+    print(f"Rota existe: {hand_data.verify_tables('Campina')}")
+
+    tables: list[str] = hand_data.query_request_tables()
+    print(hand_data.format_table_names(tables))
     # print(tables)
     # print(hand.query_request_tables(_table=tables[0]))
-    # print(hand.query_request_columns(tables[0]))
-    # dictdata = dict(zip(hand.query_request_columns(tables[0]), hand.request_data(tables[0])[0]))
-    # print(dictdata)
-    print(hand.request_data_from('nome da rota', 'data da rota', 'Campina', 'nome do vendedor', 'Alex'))
+    # print(hand_users.query_request_columns(tables[0]))
+    
+    # print(hand.request_data_from('nome da rota', 'data da rota', 'Campina', 'nome do vendedor', 'Alex'))
+
+    def request_data_users():
+
+        dictdata = dict()
+        tables: list[str] = hand_users.query_request_tables()
+        columns = hand_users.query_request_columns(tables[0])
+        data = hand_users.request_data(tables[0])
+     
+        for _data in data:
+            tempdata = dict(zip(columns, _data))
+            dictdata.update({f"{tempdata['user_name_entry']}": tempdata})
+
+        print(dictdata)
+    #request_data_users()

@@ -3,53 +3,53 @@
 {    
     "celNomesL0" : { 
         "data da rota":[
-            "nome da rota",
-            "data da rota"],
+            "nome_da_rota",
+            "data_da_rota"],
         "retorno":[
-            "nome do vendedor",
-            "data para retorno"
+            "nome_do_vendedor",
+            "data_para_retorno"
             ]
     },
 
     "celNomesL1" : {
         "cobranca":[
-            "saldo cobrado",
-            "repasse cobrado",
-            "total cobrado"],
+            "saldo_cobrado",
+            "repasse_cobrado",
+            "total_cobrado"],
 
         "capital de giro":[
-            "venda anterior",
-            "devolucao de rua",
-            "total vendido"
+            "venda_anterior",
+            "devolucao_de_rua",
+            "total_vendido"
         ]
     },
 
     "celNomesL2" : {
         "saldo devedor":[
-            "repasse novo",
-            "repasse total"],
+            "repasse_novo",
+            "repasse_total"],
         "deposito":[
-            "compra deposito",
-            "entrega deposito"
+            "compra_deposito",
+            "entrega_deposito"
         ]
     },
 
     "celNomesL3" : {
         "fichas":[
-            "fichas novas",
-            "fichas repasse",
-            "fichas em branco"
+            "fichas_novas",
+            "fichas_repasse",
+            "fichas_em_branco"
         ],
         "mercadoria na rua":[
-            "venda nova",
+            "venda_nova",
             "brindes",
-            "vl fichas branco"
+            "vl_fichas_branco"
         ]
     },
     "celNomesL4" : {
         "despesas":[
-            "despesa rota",
-            "despesa extra"
+            "despesa_rota",
+            "despesa_extra"
         ]
     }
 }

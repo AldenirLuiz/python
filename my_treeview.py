@@ -20,7 +20,9 @@ class MyTable:
             master = self.master,
             selectmode = 'extended', 
             columns=self.columns, 
-            show='headings'); self.build_view()
+            show='headings',
+            ); self.build_view(),
+            
 
     def build_view(self):
         index_count = 0

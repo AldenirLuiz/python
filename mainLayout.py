@@ -77,13 +77,13 @@ class Layout:
             # percorre os widgets presentes no pacote
             for widget in celula:
                 # removendo caracteres desnecessarios
-                nome = str(widget).replace('\t', '')
+                nome = str(widget)
                 if data_frames:
                     data_names = data_frames[nome]
                 else:
                     data_names = ""
                 frm1 = Frame(frm0, relief='flat')  # criando container da grade
-                Layout.ret_static_var(frm1, str(widget).upper(), _font=font)
+                Layout.ret_static_var(frm1, str(widget).upper().replace('_', ' '), _font=font)
                 # filtro de tipo de widget para Entry
                 if type_wid == 'entry':
                     Layout.dictEntryWidget[f'{nome}'] = Layout.ret_entry(nome=nome, pai=frm1)
