@@ -25,7 +25,7 @@ class NewView:
         
         self.menu_names = {
             'Gerenciamento': {
-                'Configuracoes': lambda:self.create_view('Campina'), 
+                'Configuracoes': lambda:self.create_empt_view('Campina'), 
                 'Users': lambda:Users(Toplevel())
             },
         }
@@ -99,7 +99,7 @@ class NewView:
         self.main_table.bind("<Double-1>", self.treeview_clicked)
 
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.create_view()
+        self.create_empt_view()
         self.table_frame.pack()
         self.window.mainloop()
 
@@ -131,7 +131,7 @@ class NewView:
             _table_names, _format_tables))
         return dict_table
         
-    def create_view(self):
+    def create_empt_view(self):
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.view = TableFrame(self.table_frame, self.cards)
@@ -170,20 +170,19 @@ class NewView:
         for _data in data:
             tempdata = dict(zip(columns, _data))
             dictdata.update({f"{tempdata['user_name_entry']}": tempdata})
-
         return dictdata
 
     def treeview_clicked(self, event):
         item = self.main_table.selection()[0]
         values = self.main_table.item(item, 'values')
+
         data = self._handler_db_data.request_data_from_column(
             values[1].replace('/','_'),
             values[2].replace('/','_'),
-            values[0]
-        )
+            values[0])
+        
         columns = self._handler_db_data.query_request_columns(values[0])
         _dict_data = dict(zip(columns, data[0]))
-        print(f"dictData: {_dict_data}")
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.view = TableFrame(self.table_frame, self.cards, _data=_dict_data)

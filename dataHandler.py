@@ -55,7 +55,6 @@ class HandlerDB:
 
         try:
             _tables = self.cursor.execute(self._query_table_exists).fetchall()
-            # print(_tables)
             return [x[0] for x in _tables]
         except db.Error as _erro:
             raise _erro
@@ -68,7 +67,6 @@ class HandlerDB:
                     self._temp_query_columns.format(_table)
                 ).fetchall()
             ]
-            # print(f"columns: {columns}")
             return columns
         else:
             return [self._error_code_table, _table]
@@ -91,8 +89,6 @@ class HandlerDB:
         return _data
 
     def request_from_vendor(self, vendor, table=None):
-        # print(self.cursor.execute("PRAGMA table_info('Campina')").fetchall())
-        
         data_request = dict()
         if table:
             _data = self.cursor.execute(self._request_from_vendor.format(table), (vendor,)).fetchall()
@@ -109,7 +105,6 @@ class HandlerDB:
         
 
     def verify_tables(self, _table: str) -> bool:
-        print(_table)
         _query_check = self.cursor.execute(self._query_table_check.format(_table)).fetchall()
         # print(f"query_check: {_query_check}")
         if _query_check != list():
@@ -145,19 +140,8 @@ if __name__ == "__main__":
         count = 0
         for user in hand_users.request_data('users'):
             print(user)
-            #hand.cursor.execute(f"DROP TABLE IF EXISTS users")
+            # hand.cursor.execute(f"DROP TABLE IF EXISTS users")
             count+=1
-    
-    # print(f"Dados da tabela: {hand_data.request_from_vendor(vendor='Jeronimo', table='Brejo')}")
-    print(f"Rota existe: {hand_data.verify_tables('Campina')}")
-
-    tables: list[str] = hand_data.query_request_tables()
-    print(hand_data.format_table_names(tables))
-    # print(tables)
-    # print(hand.query_request_tables(_table=tables[0]))
-    # print(hand_users.query_request_columns(tables[0]))
-    
-    # print(hand.request_data_from('nome da rota', 'data da rota', 'Campina', 'nome do vendedor', 'Alex'))
 
     def request_data_users():
 
@@ -171,4 +155,4 @@ if __name__ == "__main__":
             dictdata.update({f"{tempdata['user_name_entry']}": tempdata})
 
         print(dictdata)
-    #request_data_users()
+    

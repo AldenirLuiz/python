@@ -1,32 +1,22 @@
 from tkinter import Frame, Button
 from mainLayout import Layout as Lay
-from dataHandler import HandlerDB as Db
 from manage import ViewCard
 
 
 class TableFrame:
-    _handler = Db(_database='data')
     def __init__(
             self,
             _root: Frame, 
-            _cards:dict, 
-            _table:str=None,
+            _cards:dict,
             _data:dict=None) -> None:
         
         self.table_frame = Frame(_root)
         self.cards = _cards
-        self.table = _table
-
-        if _table:
-            self._data_table = self.request_data(_table)
             
         if _data:
             self._data_table = _data
         else:
             self._data_table = None
-            
-        print(f"dataTable: {self._data_table}")
-        
         
         for card in self.cards.keys():
             row = Frame(self.table_frame)
@@ -56,7 +46,6 @@ class TableFrame:
                 self._handler.request_data(my_table)[0]
             )
         )
-        # print(data_table)
         return  data_table
 
 
