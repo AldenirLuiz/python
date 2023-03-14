@@ -18,6 +18,7 @@ class NewView:
         self.window = Tk()
         
         self._names = list(self.request_data_users().keys())
+        print(self._names)
         self._routes = list()
 
         self.text_tables_routes = StringVar(self.window)
@@ -55,8 +56,12 @@ class NewView:
         self.frm_rw01_cln00.pack(side='bottom', expand=1, fill='both')
 
         # view quadro de visualizacao da planilha
-        self.frm_rw00_cln01  = Frame(self.frm_row01_column_01, relief='ridge', bd=2)
-        self.frm_rw00_cln01.pack(expand=1, fill='both')
+        self.frm_rw00_cln01  = Frame(
+            self.frm_row01_column_01, 
+            relief='ridge', bd=2, 
+            width=700, height=800
+        )
+        self.frm_rw00_cln01.pack(expand=0, fill='both')
 
         self.label_hist = Label(self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
         self.label_hist.pack(expand=1, fill='x', padx=4, ipadx=4, anchor='n')
@@ -64,17 +69,13 @@ class NewView:
         self.label_desc_route = Label(self.frm_rw00_cln00, text='Vendedor:', font=('arial', 14))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         
-        self.combo_selection = {
-            'nome_do_vendedor':self.text_tables_vendor.get(),
-            'nome_da_rota':self.text_tables_vendor.get(),
-        }
         self.combo_values = self.fill_combo()
         self.combo_vendors = ttk.Combobox( # Combobox Vendedores
             self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
             values=self.combo_values)
         self.combo_vendors.bind(
             "<<ComboboxSelected>>", 
-            lambda e, x='nome_do_vendedor': self.vendor_combo_comand(x, self.text_tables_vendor.get())
+            lambda e: self.vendor_combo_comand(self.text_tables_vendor.get())
         )
         self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
         
@@ -97,21 +98,32 @@ class NewView:
             _width=120,
         ).build_view()
         self.main_table.bind("<Double-1>", self.treeview_clicked)
+        self.combo_vendors.insert('end', self._names[0])
+        self.vendor_combo_comand(self._names[0])
 
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.create_empt_view()
         self.table_frame.pack()
         self.window.mainloop()
 
-    def vendor_combo_comand(self, event, _var):
-        self.combo_selection[event] = _var
-        self.request_tree(self.text_tables_vendor.get())
+
+    def main_table_insert(self,):
+        new_window = Toplevel(self.window)
+        self.main_table = MyTable(
+            _root=new_window,
+            _columns=self.list_headers,
+            _width=120,
+            _type='entry'
+        ).build_view()
+
+    def vendor_combo_comand(self, _var):
+        self.request_tree(_var)
 
     def request_tree(self, vendor:str):
         data:dict = self._handler_db_data.request_from_vendor(vendor)
         self.combo_routes.delete(0, END)
         self.combo_routes.config(values=list(data.keys()))
-        return data
+        self.treeview_data()
     
     def fill_combo(self):
         temp=str()
@@ -146,10 +158,13 @@ class NewView:
         )
         return  data_table
     
-    def treeview_data(self, table):
+    def treeview_data(self, _table=None, single=None):
         tree_data = list()
         vendor:str = self.text_tables_vendor.get()
-        data = self._handler_db_data.request_from_vendor(vendor, table)
+        if single:
+            data = self._handler_db_data.request_from_vendor(vendor)
+        else:
+            data = self._handler_db_data.request_from_vendor(vendor=vendor, table=_table)
         for _iten in self.main_table.get_children():
             self.main_table.delete(_iten)
         for result in data.keys():

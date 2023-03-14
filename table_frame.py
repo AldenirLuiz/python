@@ -1,4 +1,4 @@
-from tkinter import Frame, Button
+from tkinter import Frame, Button, Toplevel
 from mainLayout import Layout as Lay
 from manage import ViewCard
 
@@ -8,10 +8,12 @@ class TableFrame:
             self,
             _root: Frame, 
             _cards:dict,
-            _data:dict=None) -> None:
-        
+            _data:dict=None,
+            _type:str='label') -> None:
+        self.root= _root
         self.table_frame = Frame(_root)
         self.cards = _cards
+        self.tipo = _type
             
         if _data:
             self._data_table = _data
@@ -24,8 +26,14 @@ class TableFrame:
                 self.build_layout(row, card, _data=self._data_table)
             else:
                 frm_btt = Frame(row)
-                btt_add = Button(frm_btt, text='Adicionar')
-                btt_print = Button(frm_btt, text='Imprimir', command=lambda: self.print_pdf())
+                btt_add = Button(
+                    frm_btt, text='Adicionar Nova', 
+                    command=lambda: TopLevelWidow(Toplevel(), self.cards, _type='entry')
+                )
+                btt_print = Button(
+                    frm_btt, text='Imprimir', 
+                    command=lambda: self.print_pdf()
+                )
                 btt_add.pack(side='left')
                 btt_print.pack(side='right')
                 self.build_layout(row, card, _subwidget=frm_btt,  _data=self._data_table)
@@ -35,7 +43,7 @@ class TableFrame:
 
     def build_layout(self,_master, _card, _subwidget=None, _data=None):
         build = Lay.creat_lay(
-            _master, self.cards[_card], 'label', font=('arial', 8), subwidget=_subwidget, data=_data
+            _master, self.cards[_card], self.tipo, font=('arial', 12), subwidget=_subwidget, data=_data
         )
         return build
     
@@ -47,6 +55,11 @@ class TableFrame:
             )
         )
         return  data_table
+    
+
+class TopLevelWidow(TableFrame):
+    def __init_subclass__(cls) -> None:
+        return super().__init_subclass__()
 
 
 if __name__ == "__main__":
@@ -56,5 +69,5 @@ if __name__ == "__main__":
     window = Tk()
     frame = Frame(window)
     frame.pack()
-    view = TableFrame(_root=frame, _cards=cards)
+    view = TableFrame(_root=frame, _cards=cards, _type='label')
     window.mainloop()

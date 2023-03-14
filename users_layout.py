@@ -206,12 +206,17 @@ class MainView:
 
         
     def data_view_update(self):
-        for iten in self.frame_superior_esquerdo['text_box'].selection():
-            print(iten)
-            self.frame_superior_esquerdo['text_box'].delete(iten)
-
-        for value in self.db.request_data('users'):
-            self.frame_superior_esquerdo['text_box'].insert('', 'end', values=value)
+        if data_users := self.db.request_data('users'):
+            for _item in self.frame_superior_esquerdo['text_box'].get_children():
+                    self.frame_superior_esquerdo['text_box'].delete(_item)
+            for value in data_users:
+                self.frame_superior_esquerdo[
+                    'text_box'
+                ].insert('', 'end', values=value)
+        else:
+            self.frame_superior_esquerdo[
+                'text_box'
+            ].insert('', 'end', values=['Nenhum Usuario Cadastrado'])
 
     def pack_Widgets(self, **kwargs):
         _widgets: list[dict[str: Widget]] = kwargs.get('widgets')

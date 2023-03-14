@@ -131,6 +131,9 @@ class HandlerDB:
     class ErrConnectDB(Exception):
         pass
 
+    def delete_data(self, _table, _data):
+        pass
+
 
 if __name__ == "__main__":
     hand_data = HandlerDB(_database='data')
@@ -140,7 +143,7 @@ if __name__ == "__main__":
         count = 0
         for user in hand_users.request_data('users'):
             print(user)
-            # hand.cursor.execute(f"DROP TABLE IF EXISTS users")
+            hand_users.cursor.execute(f"DROP TABLE IF EXISTS users")
             count+=1
 
     def request_data_users():
@@ -155,4 +158,5 @@ if __name__ == "__main__":
             dictdata.update({f"{tempdata['user_name_entry']}": tempdata})
 
         print(dictdata)
-    
+
+    request_users()
