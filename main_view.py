@@ -18,7 +18,6 @@ class NewView:
         self.window = Tk()
         
         self._names = list(self.request_data_users().keys())
-        print(self._names)
         self._routes = list()
 
         self.text_tables_routes = StringVar(self.window)
@@ -113,7 +112,7 @@ class NewView:
             _root=new_window,
             _columns=self.list_headers,
             _width=120,
-            _type='entry'
+            _type='label'
         ).build_view()
 
     def vendor_combo_comand(self, _var):
@@ -146,7 +145,7 @@ class NewView:
     def create_empt_view(self):
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = TableFrame(self.table_frame, self.cards)
+        self.view = TableFrame(self.table_frame)
         self.table_frame.pack()
     
     def request_data(self, _table):
@@ -200,7 +199,7 @@ class NewView:
         _dict_data = dict(zip(columns, data[0]))
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = TableFrame(self.table_frame, self.cards, _data=_dict_data)
+        self.view = TableFrame(self.table_frame, _data=_dict_data, _type='label')
         self.table_frame.pack()
 
 
