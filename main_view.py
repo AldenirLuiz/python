@@ -9,6 +9,7 @@ from main_menu import MainMenu
 from my_treeview import MyTable
 from table_frame import TableFrame
 
+
 class NewView:
     _handler_db_users = Db(_database='users')
     _handler_db_data = Db(_database='data')

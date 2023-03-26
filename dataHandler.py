@@ -37,7 +37,7 @@ class HandlerDB:
 
     def query_add(self, _data: dict[str, str], _table:str=None, contiguos:bool=False) -> str:
         if not _table:
-            _table_: str = f"{_data['nome_da_rota']}{_data['data_da_rota']}"
+            _table_: str = f"{_data['nome_da_rota']}"
         else:
             _table_ = _table
         
@@ -159,4 +159,4 @@ if __name__ == "__main__":
 
         print(dictdata)
 
-    request_users()
+    print(hand_data.query_request_columns('Santa_Luzia'))

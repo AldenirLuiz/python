@@ -38,12 +38,14 @@
         "fichas":[
             "fichas_novas",
             "fichas_repasse",
-            "fichas_em_branco"
+            "fichas_em_branco",
+            "total_de_fichas"
         ],
         "mercadoria na rua":[
             "venda_nova",
             "brindes",
-            "vl_fichas_branco"
+            "vl_fichas_branco",
+            "total_na_rua"
         ]
     },
     "celNomesL4" : {

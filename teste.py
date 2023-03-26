@@ -49,6 +49,7 @@ def dict_dados():
             'fichas_novas': f'{randint(34, 44)}',
             'fichas_em_branco': f'{randint(0, 6)}',
             'fichas_repasse': f'{randint(2, 12)}',
+            'total_de_fichas': f'{randint(38, 46)}',
             'venda_anterior': f'{randint(28000, 36000)}',
             'devolucao_de_rua': f'{randint(8769, 12540)}',
             'total_vendido': '0',
@@ -57,6 +58,7 @@ def dict_dados():
             'venda_nova': f'{randint(18890, 36783)}',
             'brindes': f'{randint(112, 323)}',
             'vl_fichas_branco': f'{randint(0, 1000)}',
+            'total_na_rua': '0',
             'despesa_rota': f'{randint(600, 1000)}',
             'despesa_extra': f'{randint(0, 1000)}'}
 
