@@ -146,7 +146,7 @@ class NewView:
     def create_empt_view(self):
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = TableFrame(self.table_frame)
+        self.view = TableFrame(self.table_frame, _type='label')
         self.table_frame.pack()
     
     def request_data(self, _table):

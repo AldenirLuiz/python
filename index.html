@@ -1,286 +1,286 @@
 
-<!DOCTYPE html>
-    <html>
-        <head>
-            <title>Corro Variedades</title>
-            <style>
-                * {
-                    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-                    font-size: 0.9rem;
-                    font-weight: lighter;}
-                h3{
-                    margin:0;
-                    padding-left:4px; 
-                    padding:8px;
-                    justify-self:right;}
-                .intern-desc {
-                    width:190px;
-                    height:40;
-                    border-left: 1px solid black;
-                    border-right: 1px solid black;
-                    border-bottom: 1px solid black;}
-                .intern-val {
-                    width:160px;
-                    height:40;
-                    border-left: 1px solid black;
-                    border-right: 1px solid black;
-                    border-bottom: 1px solid black;}
-                .card-base {
-                    display: flex; 
-                    flex-direction: row;}
-                .itens-r {
-                    display: flex;
-                    padding: 8px;
-                    margin: 2px;}
-                .master {
-                    display: flex;
-                    flex-direction: column;}
-                .card-row{
-                    display: flex;
-                    flex-direction: row;}
-                .desc {
-                    border: 1px solid black;
-                    color: darkgray;
-                    text-align: center;
-                    justify-content: center;}
-            </style>
-        </head>
-        <body>
-            <div class="master">
-                <div class="card-row row-0">
-                    <div class="card">
-                        <h3 class=desc>DATA DA ROTA</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>NOME DA ROTA:</h3>
+    <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Corro Variedades</title>
+                <style>
+                    * {
+                        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+                        font-size: 1rem;
+                        font-weight: lighter;}
+                    h3{
+                        margin:0;
+                        padding-left:4px; 
+                        padding:8px;
+                        justify-self:right;}
+                    .intern-desc {
+                        width:190px;
+                        height:40;
+                        border-left: 1px solid black;
+                        border-right: 1px solid black;
+                        border-bottom: 1px solid black;}
+                    .intern-val {
+                        width:160px;
+                        height:40;
+                        border-left: 1px solid black;
+                        border-right: 1px solid black;
+                        border-bottom: 1px solid black;}
+                    .card-base {
+                        display: flex; 
+                        flex-direction: row;}
+                    .itens-r {
+                        display: flex;
+                        padding: 8px;
+                        margin: 2px;}
+                    .master {
+                        display: flex;
+                        flex-direction: column;}
+                    .card-row{
+                        display: flex;
+                        flex-direction: row;}
+                    .desc {
+                        border: 1px solid black;
+                        color: darkgray;
+                        text-align: center;
+                        justify-content: center;}
+                </style>
+            </head>
+            <body>
+                <div class="master">
+                    <div class="card-row row-0">
+                        <div class="card">
+                            <h3 class=desc>DATA DA ROTA</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>NOME DA ROTA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="nome_da_rota">nome_da_rota</h3>
+                                </div>
                             </div>
-                            <div class="intern-val">
-                                <h3 id="nome_da_rota">nome_da_rota</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>DATA DA ROTA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="data_da_rota">data_da_rota</h3>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>DATA DA ROTA:</h3>
+                        <div class="card">
+                            <h3 class=desc>RETORNO</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>NOME DO VENDEDOR:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="nome_do_vendedor">nome_do_vendedor</h3>
+                                </div>
                             </div>
-                            <div class="intern-val">
-                                <h3 id="data_da_rota">data_da_rota</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>DATA PARA RETORNO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="data_para_retorno">data_para_retorno</h3>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3 class=desc>RETORNO</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>NOME DO VENDEDOR:</h3>
+                    <div class="card-row row-1">
+                        <div class="card">
+                            <h3 class=desc>COBRANCA</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>SALDO COBRADO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="saldo_cobrado">saldo_cobrado</h3>
+                                </div>
                             </div>
-                            <div class="intern-val">
-                                <h3 id="nome_do_vendedor">nome_do_vendedor</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>REPASSE COBRADO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="repasse_cobrado">repasse_cobrado</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>TOTAL COBRADO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="total_cobrado">total_cobrado</h3>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>DATA PARA RETORNO:</h3>
+                        <div class="card">
+                            <h3 class=desc>CAPITAL DE GIRO</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>VENDA ANTERIOR:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="venda_anterior">venda_anterior</h3>
+                                </div>
                             </div>
-                            <div class="intern-val">
-                                <h3 id="data_para_retorno">data_para_retorno</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>DEVOLUCAO DE RUA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="devolucao_de_rua">devolucao_de_rua</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>TOTAL VENDIDO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="total_vendido">total_vendido</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-row row-2">
+                        <div class="card">
+                            <h3 class=desc>SALDO DEVEDOR</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>REPASSE NOVO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="repasse_novo">repasse_novo</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>REPASSE TOTAL:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="repasse_total">repasse_total</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3 class=desc>DEPOSITO</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>COMPRA DEPOSITO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="compra_deposito">compra_deposito</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>ENTREGA DEPOSITO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="entrega_deposito">entrega_deposito</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-row row-3">
+                        <div class="card">
+                            <h3 class=desc>FICHAS</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>FICHAS NOVAS:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="fichas_novas">fichas_novas</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>FICHAS REPASSE:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="fichas_repasse">fichas_repasse</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>FICHAS EM BRANCO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="fichas_em_branco">fichas_em_branco</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>TOTAL DE FICHAS:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="total_de_fichas">total_de_fichas</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3 class=desc>MERCADORIA NA RUA</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>VENDA NOVA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="venda_nova">venda_nova</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>BRINDES:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="brindes">brindes</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>VL FICHAS BRANCO:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="vl_fichas_branco">vl_fichas_branco</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>TOTAL NA RUA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="total_na_rua">total_na_rua</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-row row-4">
+                        <div class="card">
+                            <h3 class=desc>DESPESAS</h3>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>DESPESA ROTA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="despesa_rota">despesa_rota</h3>
+                                </div>
+                            </div>
+                            <div class="card-base">
+                                <div class="intern-desc">
+                                    <h3>DESPESA EXTRA:</h3>
+                                </div>
+                                <div class="intern-val">
+                                    <h3 id="despesa_extra">despesa_extra</h3>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-row row-1">
-                    <div class="card">
-                        <h3 class=desc>COBRANCA</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>SALDO COBRADO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="saldo_cobrado">saldo_cobrado</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>REPASSE COBRADO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="repasse_cobrado">repasse_cobrado</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>TOTAL COBRADO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="total_cobrado">total_cobrado</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3 class=desc>CAPITAL DE GIRO</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>VENDA ANTERIOR:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="venda_anterior">venda_anterior</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>DEVOLUCAO DE RUA:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="devolucao_de_rua">devolucao_de_rua</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>TOTAL VENDIDO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="total_vendido">total_vendido</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-row row-2">
-                    <div class="card">
-                        <h3 class=desc>SALDO DEVEDOR</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>REPASSE NOVO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="repasse_novo">repasse_novo</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>REPASSE TOTAL:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="repasse_total">repasse_total</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3 class=desc>DEPOSITO</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>COMPRA DEPOSITO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="compra_deposito">compra_deposito</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>ENTREGA DEPOSITO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="entrega_deposito">entrega_deposito</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-row row-3">
-                    <div class="card">
-                        <h3 class=desc>FICHAS</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>FICHAS NOVAS:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="fichas_novas">fichas_novas</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>FICHAS REPASSE:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="fichas_repasse">fichas_repasse</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>FICHAS EM BRANCO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="fichas_em_branco">fichas_em_branco</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>TOTAL DE FICHAS:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="total_de_fichas">total_de_fichas</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <h3 class=desc>MERCADORIA NA RUA</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>VENDA NOVA:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="venda_nova">venda_nova</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>BRINDES:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="brindes">brindes</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>VL FICHAS BRANCO:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="vl_fichas_branco">vl_fichas_branco</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>TOTAL NA RUA:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="total_na_rua">total_na_rua</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-row row-4">
-                    <div class="card">
-                        <h3 class=desc>DESPESAS</h3>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>DESPESA ROTA:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="despesa_rota">despesa_rota</h3>
-                            </div>
-                        </div>
-                        <div class="card-base">
-                            <div class="intern-desc">
-                                <h3>DESPESA EXTRA:</h3>
-                            </div>
-                            <div class="intern-val">
-                                <h3 id="despesa_extra">despesa_extra</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        <script>
-            (function(){
-                window.print();
-            })();
-        </script>
-    </html>
+            </body>
+            <script>
+                (function(){
+                    window.print();
+                })();
+            </script>
+        </html>

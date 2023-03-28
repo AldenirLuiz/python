@@ -1,4 +1,5 @@
-from tkinter import Frame, Button, Toplevel, Entry
+from tkinter import Frame, Button, Toplevel, Entry, messagebox
+
 from mainLayout import Layout as Lay
 from manage import ViewCard
 from dataHandler import HandlerDB as DB
@@ -41,7 +42,9 @@ class Process:
     _exclude=[
         'total_cobrado',
         'total_vendido',
-        'entrega_deposito']
+        'entrega_deposito',
+        'total_de_fichas',
+        'total_na_rua']
     temp_cards: dict = ViewCard().layers
     def __init__(self) -> None:
         self.data_exclude = self._exclude
@@ -89,8 +92,18 @@ class CalcData:
             'total_de_fichas': 
                 int(self.data['fichas_novas'].get()) +
                 int(self.data['fichas_repasse'].get()) +
-                int(self.data['fichas_em_branco'].get()),})
-    
+                int(self.data['fichas_em_branco'].get()),
+            'entrega_deposito': 
+                int(self.data['compra_deposito'].get()) +
+                int(self.data['devolucao_de_rua'].get()) - (
+                    int(self.data['venda_nova'].get()) +
+                    int(self.data['brindes'].get())),
+            'total_na_rua':
+                int(self.data['venda_nova'].get())+
+                int(self.data['brindes'].get())+
+                int(self.data['vl_fichas_branco'].get())
+                })
+        
     @classmethod
     def dict_val(self) -> dict:
         print(f'dict')
@@ -140,10 +153,21 @@ class MyLayout:
         self.table_frame.pack()
 
         if _type == 'entry': # requisitando os widgets com dados de entrada
-            command_button.config(command=lambda: self._db.query_add(CalcData(self.widgets_values).dict_val()))
+            command_button.config(command=lambda: self.add_data())
         else:
             command_button.config(command=lambda: TopLevelWidow(Toplevel(), _type='entry'))
 
+    def add_data(self):
+        try:
+            data = CalcData(self.widgets_values).dict_val()
+            if self._db.query_add(CalcData(self.widgets_values).dict_val()) == "All data are aded":
+                messagebox.showinfo('showinfo',"Os Dados Foram Inseridos\nTudo Ok")
+                print("passed")
+            else:
+                print('Nenhum dado foi inserido')
+        except ValueError as _error:
+            messagebox.showwarning('showwarning',"Um ERRO ocorreu ao tentar guardar os dados\nVerifique os dados antes de salvar")
+        
 
 class MyButton(Button):
     def __init__(cls, _root, _text, _command=None) -> None:
@@ -163,9 +187,8 @@ class TopLevelWidow(TableFrame):
 if __name__ == "__main__":
 
     from tkinter import Tk, Frame
-    dataf = RequestData('Campina')
-    dict_data= dataf.dict_val()
-    print(dict_data)
+    dataf = RequestData('Itaporanga')
+    dict_data= dataf.data_table
     cards = ViewCard.layers
     window = Tk()
     window.tk_strictMotif(1)
