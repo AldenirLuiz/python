@@ -13,75 +13,57 @@ from table_frame import TableFrame
 class NewView:
     _handler_db_users = Db(_database='users')
     _handler_db_data = Db(_database='data')
-    cards = ViewCard.layers
     list_headers = ['Rota', 'Data', 'Retorno']
+    menu_names = {
+            'Gerenciamento': {
+                'Users': lambda:Users(Toplevel())}}
     def __init__(self) -> None:
         self.window = Tk()
-        
+        self.window.geometry('1280x640')
         self._names = list(self.request_data_users().keys())
         self._routes = list()
-
         self.text_tables_routes = StringVar(self.window)
         self.text_tables_vendor = StringVar(self.window)
-        
-        self.menu_names = {
-            'Gerenciamento': {
-                'Configuracoes': lambda:self.create_empt_view('Campina'), 
-                'Users': lambda:Users(Toplevel())
-            },
-        }
-
         self.menu = MainMenu(master=self.window, names=self.menu_names)
-
         self.frm_primary_rows = Frame(self.window, relief='ridge', bd=2)
         self.frm_secondary_rows = Frame(self.window,)
         self.frm_primary_rows.pack(side='top', expand=0, fill='x')
         self.frm_secondary_rows.pack(side='bottom', expand=1, fill='both')
-
         self.frm_labels = Frame(self.frm_primary_rows)
         self.label_0 = Label(self.frm_labels, text='', anchor='ne', font=('arial', 12), justify='right', width=30)
         self.label_0.pack(side='right', expand=1, fill='x')
         self.clock = MyClock(self.frm_labels, self.label_0)
         self.frm_labels.pack(expand=0, fill='x')
-
         self.frm_row01_column_00 = Frame(self.frm_secondary_rows)
         self.frm_row01_column_01 = Frame(self.frm_secondary_rows) # side='left'
         self.frm_row01_column_00.pack(side='left', expand=1, fill='both')
         self.frm_row01_column_01.pack(side='right', expand=1, fill='both')
-
         # view quadro geral de rotas
         self.frm_rw00_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=2) #linha p/ combobox
         self.frm_rw01_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=2) # linha p/ tabela
         self.frm_rw00_cln00.pack(side='top', expand=1, fill='both')
         self.frm_rw01_cln00.pack(side='bottom', expand=1, fill='both')
-
         # view quadro de visualizacao da planilha
         self.frm_rw00_cln01  = Frame(
             self.frm_row01_column_01, 
             relief='ridge', bd=2, 
-            width=700, height=800
-        )
+            width=700, height=800)
         self.frm_rw00_cln01.pack(expand=0, fill='both')
-
         self.label_hist = Label(self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
         self.label_hist.pack(expand=1, fill='x', padx=4, ipadx=4, anchor='n')
-
         self.label_desc_route = Label(self.frm_rw00_cln00, text='Vendedor:', font=('arial', 14))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
-        
         self.combo_values = self.fill_combo()
+
         self.combo_vendors = ttk.Combobox( # Combobox Vendedores
             self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
             values=self.combo_values)
         self.combo_vendors.bind(
             "<<ComboboxSelected>>", 
-            lambda e: self.vendor_combo_comand(self.text_tables_vendor.get())
-        )
+            lambda e: self.request_tree(self.text_tables_vendor.get()))
         self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
-        
         self.label_desc_vendor = Label(self.frm_rw00_cln00, text='Rota:', font=('arial', 14))
         self.label_desc_vendor.pack(side='left', padx=4, ipadx=4)
-        
         self.combo_routes = ttk.Combobox( # Combobox Rotas
             self.frm_rw00_cln00, textvariable=self.text_tables_routes, 
             values=self._routes,
@@ -91,33 +73,18 @@ class NewView:
             lambda e: self.treeview_data(self.text_tables_routes.get())
         )
         self.combo_routes.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
-        
         self.main_table = MyTable(
             _root=self.frm_rw01_cln00,
             _columns=self.list_headers,
-            _width=120,
-        ).build_view()
+            _width=120) .build_view()
+
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
-        self.vendor_combo_comand(self._names[0])
-
+        self.request_tree(self._names[0])
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.create_empt_view()
         self.table_frame.pack()
         self.window.mainloop()
-
-
-    def main_table_insert(self,):
-        new_window = Toplevel(self.window)
-        self.main_table = MyTable(
-            _root=new_window,
-            _columns=self.list_headers,
-            _width=120,
-            _type='label'
-        ).build_view()
-
-    def vendor_combo_comand(self, _var):
-        self.request_tree(_var)
 
     def request_tree(self, vendor:str):
         data:dict = self._handler_db_data.request_from_vendor(vendor)
@@ -132,32 +99,12 @@ class NewView:
             return temp
         return ["Nenhum Usuario"] 
 
-    def request_table_names(self, _user=None, _route=None) -> dict:
-        """requisitando e formatando os nomes das tableas existentes
-        <:return dict column|data"""
-
-        _table_names: list = self._handler_db_data.query_request_tables()
-        _format_tables: list = self._handler_db_data.format_table_names(_table_names)
-
-        dict_table = dict(zip(  # empacotando os dados em chaves:valores
-            _table_names, _format_tables))
-        return dict_table
-        
     def create_empt_view(self):
         self.table_frame.destroy()
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.view = TableFrame(self.table_frame, _type='label')
         self.table_frame.pack()
-    
-    def request_data(self, _table):
-        my_table = _table
-        data_table: dict = dict(zip(
-                self._handler_db_data.query_request_columns(my_table), 
-                self._handler_db_data.request_data(my_table)[0]
-            )
-        )
-        return  data_table
-    
+
     def treeview_data(self, _table=None, single=None):
         tree_data = list()
         vendor:str = self.text_tables_vendor.get()
@@ -202,6 +149,7 @@ class NewView:
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.view = TableFrame(self.table_frame, _data=_dict_data, _type='label')
         self.table_frame.pack()
+
 
 
 if __name__ == '__main__':

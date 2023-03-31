@@ -1,9 +1,9 @@
 from tkinter import Frame, Button, Toplevel, Entry, messagebox
-
 from mainLayout import Layout as Lay
 from manage import ViewCard
 from dataHandler import HandlerDB as DB
-
+from pdf_print import Header
+import os
 
 class TableFrame:
     """
@@ -72,7 +72,6 @@ class CalcData:
         self.data = data
         self.processed = self.process_data()
 
-        # print(Process.include_calc_fields(self, self.data, self.processed))
 
     def process_data(self,):
 
@@ -109,6 +108,7 @@ class CalcData:
         print(f'dict')
         return self.processed_data
 
+
 class RequestData:
     data_table: dict = dict()
     _handler = DB(_database='data')
@@ -122,6 +122,19 @@ class RequestData:
     def dict_val(self) -> dict:
         return  self.data_table
  
+ 
+
+class PdfGen:
+    def __init__(self, data) -> None:
+        self.browsers = ["firefox", "chrome", "edge", "explorer"]
+        self.template = Header(data, None)
+        self.template.create_template()
+        for browser in self.browsers:
+            if not os.system(f"{browser} index.html"):
+                print('A Pagina foi gerada.')
+                return None
+        
+
 
 class MyLayout:
     """
@@ -143,6 +156,7 @@ class MyLayout:
             else: # construindo os demais frames dos cards
                 self.frm_btt = Frame(self.btt_row)
                 command_button = MyButton(self.frm_btt, 'Cadastrar', _command)
+                printer_button = MyButton(self.frm_btt, 'Imprimir', lambda:PdfGen(_data))
                 
                 self.widgets_values.update(Lay.creat_lay(
                     self.btt_row, ViewCard.layers[card], _type, 

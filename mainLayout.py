@@ -79,7 +79,7 @@ class Layout:
                 # removendo caracteres desnecessarios
                 nome = str(widget)
                 if data_frames:
-                    data_names = data_frames[nome]
+                    data_names = data_frames.get(nome)
                 else:
                     data_names = ""
                 frm1 = Frame(frm0, relief='flat')  # criando container da grade
