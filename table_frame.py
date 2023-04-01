@@ -3,6 +3,7 @@ from mainLayout import Layout as Lay
 from manage import ViewCard
 from dataHandler import HandlerDB as DB
 from pdf_print import Header
+import webbrowser
 import os
 
 class TableFrame:
@@ -126,13 +127,10 @@ class RequestData:
 
 class PdfGen:
     def __init__(self, data) -> None:
-        self.browsers = ["firefox", "chrome", "edge", "explorer"]
         self.template = Header(data, None)
         self.template.create_template()
-        for browser in self.browsers:
-            if not os.system(f"{browser} index.html"):
-                print('A Pagina foi gerada.')
-                return None
+        webbrowser.open("index.html")
+        
         
 
 
