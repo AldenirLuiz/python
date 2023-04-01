@@ -129,7 +129,7 @@ class PdfGen:
     def __init__(self, data) -> None:
         self.template = Header(data, None)
         self.template.create_template()
-        webbrowser.open("index.html")
+        webbrowser.open("index.html", new=0)
         
         
 
