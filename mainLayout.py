@@ -66,7 +66,8 @@ class Layout:
         desc: str = None,
         subwidget=None,
         data: dict = None,
-        font=None ) -> dict:
+        font=None,
+        default=None) -> dict:
 
         data_frames: dict = data
             
@@ -87,6 +88,8 @@ class Layout:
                 # filtro de tipo de widget para Entry
                 if type_wid == 'entry':
                     Layout.dictEntryWidget[f'{nome}'] = Layout.ret_entry(nome=nome, pai=frm1)
+                    if default:
+                        Layout.dictEntryWidget[f'{nome}'].insert(0, data_frames.get(nome))
                 else:  # filtro de tipo de widget para Label
                     Layout.dictEntryWidget[f'{nome}'] = Layout.ret_label(nome=nome, pai=frm1, vtext=data_names, _font=font)
                 frm1.pack(anchor='w', expand=1, fill='both')  # alocando do container da grade

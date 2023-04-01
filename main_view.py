@@ -59,7 +59,7 @@ class NewView:
             self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
             values=self.combo_values)
         self.combo_vendors.bind(
-            "<<ComboboxSelected>>", 
+            "<<ComboboxSelected>>",
             lambda e: self.request_tree(self.text_tables_vendor.get()))
         self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
         self.label_desc_vendor = Label(self.frm_rw00_cln00, text='Rota:', font=('arial', 14))
@@ -133,6 +133,7 @@ class NewView:
             tempdata = dict(zip(columns, _data))
             dictdata.update({f"{tempdata['user_name_entry']}": tempdata})
         return dictdata
+
 
     def treeview_clicked(self, event):
         item = self.main_table.selection()[0]
