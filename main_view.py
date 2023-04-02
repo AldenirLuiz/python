@@ -2,12 +2,11 @@ from tkinter import *
 from tkinter import ttk
 from dataHandler import HandlerDB as Db
 from mainLayout import Layout as Lay
-from manage import ViewCard
 from clockWise import MyClock
 from users_layout import MainView as Users
 from main_menu import MainMenu
 from my_treeview import MyTable
-from table_frame import TableFrame
+from table_frame import MyCards
 
 
 class NewView:
@@ -77,12 +76,13 @@ class NewView:
             _root=self.frm_rw01_cln00,
             _columns=self.list_headers,
             _width=120) .build_view()
+        
 
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
         self.request_tree(self._names[0])
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.create_empt_view()
+        self.view = MyCards(self.table_frame, _type='label')
         self.table_frame.pack()
         self.window.mainloop()
 
@@ -99,11 +99,6 @@ class NewView:
             return temp
         return ["Nenhum Usuario"] 
 
-    def create_empt_view(self):
-        self.table_frame.destroy()
-        self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = TableFrame(self.table_frame, _type='label')
-        self.table_frame.pack()
 
     def treeview_data(self, _table=None, single=None):
         tree_data = list()
@@ -116,9 +111,9 @@ class NewView:
             self.main_table.delete(_iten)
         for result in data.keys():
             for value in data[result]:
-                str_date = value[1].replace('_', '/')
-                str_date_return = value[3].replace('_', '/')
-                self.main_table.insert('', 'end', values=[value[0], str_date, str_date_return])
+                str_date = value[1]
+                str_date_return = value[3]
+                self.main_table.insert('', 0, values=[value[0], str_date, str_date_return])
                 tree_data.append([value[0], str_date, str_date_return])
         return tree_data
 
@@ -136,19 +131,20 @@ class NewView:
 
 
     def treeview_clicked(self, event):
+        self.__delattr__('view')
+        self.table_frame.destroy()
+
         item = self.main_table.selection()[0]
         values = self.main_table.item(item, 'values')
 
         data = self._handler_db_data.request_data_from_column(
-            values[1].replace('/','_'),
-            values[2].replace('/','_'),
-            values[0])
+            values[1].replace('/','_'), values[2].replace('/','_'), values[0])
         
         columns = self._handler_db_data.query_request_columns(values[0])
         _dict_data = dict(zip(columns, data[0]))
-        self.table_frame.destroy()
+        
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = TableFrame(self.table_frame, _data=_dict_data, _type='label')
+        self.view = MyCards(self.table_frame, _data=_dict_data, _type='label')
         self.table_frame.pack()
 
 
