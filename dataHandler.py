@@ -1,10 +1,11 @@
 import sqlite3 as db
 from sqlite3 import OperationalError, Connection, Cursor
+from SysWay import MyWayApp as Way
 import os
 
 
 class HandlerDB:
-    __ROOT_DIR__: str = os.path.join(os.path.dirname(__file__).replace('library.zip', ''))
+    __ROOT_DIR__: str = Way()
     __DATABASE_DATA__: str = 'dadosCobranca.db'
     __DATABASE_USERS__: str = 'userData.db'
     _query_table_exists: str = "SELECT name FROM sqlite_master WHERE type='table';"
