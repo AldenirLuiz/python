@@ -1,19 +1,21 @@
 from tkinter import *
 from tkinter import ttk
 from dataHandler import HandlerDB as Db
-from mainLayout import Layout as Lay
 from clockWise import MyClock
 from users_layout import MainView as Users
 from main_menu import MainMenu
 from my_treeview import MyTable
 from table_frame import MyCards
 from manage import ViewCard
+from SysWay import MyWayApp as way
 
 
 class NewView:
     _handler_db_users = Db(_database='users')
     _handler_db_data = Db(_database='data')
     list_headers = ['Rota', 'Data', 'Retorno']
+    
+
     menu_names = {
             'Configurações': {
                 'Users': lambda:Users(Toplevel()),
@@ -25,9 +27,10 @@ class NewView:
         self.window = Tk()
         self.window.geometry(f'{self.window.winfo_screenwidth()}x{self.window.winfo_screenheight()}')
         self.window.overrideredirect(False)
-        self.window.state('zoomed')
+        #self.window.state('withdrawn')
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
-        self.window.iconbitmap('corro.ico')
+        self.icon = PhotoImage(file=way('pessoa.png').walk_sys_file())
+        self.window.iconphoto(True, self.icon)
         self._names = list(self.request_data_users().keys())
         self._routes = list()
         self.text_tables_routes = StringVar(self.window)
@@ -161,7 +164,6 @@ class NewView:
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.view = MyCards(self.table_frame, _data=_dict_data, _type='label', _cards=self.layers)
         self.table_frame.pack()
-
 
 
 if __name__ == '__main__':
