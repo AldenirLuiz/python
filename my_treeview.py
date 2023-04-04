@@ -1,5 +1,5 @@
 from tkinter import Tk, Frame
-from tkinter.ttk import Treeview
+from tkinter.ttk import Treeview, Style
 from ctypes import Union
 
 class MyTable:
@@ -11,20 +11,26 @@ class MyTable:
         <columns: required*>columns names for dispay in top view
         <width: optional>define max width of widget
     """
-    def __init__(self, _root: Tk, _columns: list, _width: int=100) -> None:
+    def __init__(self, _root: Tk, _columns: list, _width: int=100, font:tuple=('arial', 12)) -> None:
+        self.font:tuple = font
+        self.style: Style = Style()
         self.master: Tk = _root
-        self.columns: Union[list:str]= _columns
-        self.max_width = _width
+        self.columns: Union[list:str] = _columns
+        self.max_width: int = _width
+        self.font_bold = (*self.font, 'bold')
+        
 
         self.main_table = Treeview(
             master = self.master,
-            selectmode = 'extended', 
+            selectmode = 'extended',
             columns=self.columns, 
             show='headings',
             ); self.build_view(),
             
 
     def build_view(self):
+        self.style.configure("Treeview.Heading", font=self.font_bold)
+        self.style.configure("Treeview", font=self.font)
         index_count = 0
         for column_name in self.columns:
             self.main_table.column(

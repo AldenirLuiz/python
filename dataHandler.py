@@ -4,10 +4,9 @@ import os
 
 
 class HandlerDB:
-    __ROOT_DIR__: str = os.path.abspath(os.path.dirname(__file__))
+    __ROOT_DIR__: str = os.path.join(os.path.dirname(__file__).replace('library.zip', ''))
     __DATABASE_DATA__: str = 'dadosCobranca.db'
     __DATABASE_USERS__: str = 'userData.db'
-
     _query_table_exists: str = "SELECT name FROM sqlite_master WHERE type='table';"
     _query_table_check: str = "SELECT name FROM sqlite_master WHERE type='table' AND name='{}';"
     _temp_query_columns: str = "PRAGMA table_info({})"
@@ -19,13 +18,13 @@ class HandlerDB:
     _error_code_table: str = "Tabela Inexistente"
 
     def __init__(self, _database:str='users') -> None:
+        
         if _database == 'users':
             self.database = self.__DATABASE_USERS__
         else:
             self.database = self.__DATABASE_DATA__
         try:
-            self.banco: Connection = db.connect(
-                f'{self.__ROOT_DIR__}/dataBase/{self.database}')
+            self.banco: Connection = db.connect(f'{self.__ROOT_DIR__}/dataBase/{self.database}')
             self.cursor: Cursor = self.banco.cursor()
         except OperationalError as _erro:
             message: str = f"""Problema ao Conectar com o Banco de dados.\n

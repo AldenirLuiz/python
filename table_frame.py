@@ -16,7 +16,7 @@ class MyLayout:
     _db = DB('data')
     _exclude = ['data da rota', 'retorno']
 
-    def __init__(self, _root, _data=None, _type='label') -> None:
+    def __init__(self, _root, _data=None, _type='label', _cards=None) -> None:
         self.my_cards = ViewCard()
         self.root = _root
         self.data = _data
@@ -26,21 +26,26 @@ class MyLayout:
         self.widgets_values = dict()
         self.last_value = int()
         self.my_child = None
-        self.cards = self.my_cards.layers
         self.table_frame = Frame(_root)
+        self.process = Process()
+
+        if _cards:
+            self.cards = _cards
+        else:
+            self.cards = self.my_cards.layers
         
     
     def _type(self):
 
         if self.type_of == 'entry':
             self.comand = lambda: self.add_data()
-            self.cards = Process().exclude_fields()
-            
+            self.cards = self.process.exclude_fields()
         else:
-            self.comand = lambda: tree_objects.update({'child':MyCards(
+            self.cards = self.my_cards.layers
+            self.comand = lambda: MyCards(
                 _root=Toplevel(),
                 _type='entry', 
-                _data=self.data,)})
+                _data=self.data,)
             
 
     def add_data(self):
@@ -51,6 +56,7 @@ class MyLayout:
                 self.last_value = 0
             data = CalcData(self.widgets_values, self.last_value).process()
             if self._db.query_add(data) == "All data are aded":
+                self.cards = self.my_cards.layers
                 self.root.destroy()
                 for obj in tree_objects.values():
                     del obj
@@ -68,14 +74,14 @@ class MyLayout:
 
 
 class MyCards(MyLayout):
-    def __init__(self, _root, _data=None, _type='label') -> None:
-        super().__init__(_root=_root, _data=_data, _type=_type)
+    def __init__(self, _root, _data=None, _type='label', _cards=None) -> None:
+        super().__init__(_root=_root, _data=_data, _type=_type, _cards=_cards)
         self.my_cards = ViewCard()
         self._type()
-        for obj in tree_objects.values():
-            del obj
-        self.cards = self.my_cards.layers
-        tree_objects['fater'] = self
+        if _cards:
+            self.cards = _cards
+        else:
+            self.cards = self.my_cards.layers
 
         for card in self.cards:
             self.frm_row = Frame(self.root)
@@ -108,19 +114,22 @@ class MyCards(MyLayout):
 
 
 class Process:
-    _exclude=[
+    
+    def __init__(self) -> None:
+        self.exclude=[
         'total_cobrado','total_vendido','entrega_deposito',
         'total_de_fichas','total_na_rua','venda_anterior',]
-    def __init__(self) -> None:
         self.my_cards = ViewCard()
-        self.data_exclude = self._exclude
-        self.temp_cards: dict = self.my_cards.layers
+        self.temp_cards: dict = dict()
 
     def exclude_fields(self):
+        self.my_cards = ViewCard()
+        self.temp_cards: dict = dict()
+        self.temp_cards.update(self.my_cards.layers)
         for cell in self.temp_cards.keys():
             for card in self.temp_cards[cell]:
                 for value in self.temp_cards[cell][card]:
-                    if value in self.data_exclude:
+                    if value in self.exclude:
                         self.temp_cards[cell][card].remove(value)
         return self.temp_cards
 

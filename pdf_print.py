@@ -17,7 +17,7 @@ class ViewCard:
         return self.layers
 
 
-path = os.path.abspath(os.path.dirname(__file__))
+path = os.path.abspath(os.path.dirname(__file__)).replace('library.zip', '')
 form_data = ViewCard.layers 
 
 class Header:

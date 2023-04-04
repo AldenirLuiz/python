@@ -169,7 +169,7 @@ class MainView:
             'btt_exit': 
                 Button(
                     self.containers_colunas_primarias['linha00_coluna00'],
-                    text='<- Sair', border=2, relief='ridge', command=lambda x=0: exit(x)
+                    text='<- Sair', border=2, relief='ridge', command=lambda: master.destroy()
                 ),
         }
         count = 0
