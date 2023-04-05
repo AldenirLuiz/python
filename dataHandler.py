@@ -5,7 +5,8 @@ import os
 
 
 class HandlerDB:
-    __ROOT_DIR__: str = Way()
+    __ROOT_DIR__: list = Way(path='dataBase', first=False).walk_sys_file()
+    # print(__ROOT_DIR__)
     __DATABASE_DATA__: str = 'dadosCobranca.db'
     __DATABASE_USERS__: str = 'userData.db'
     _query_table_exists: str = "SELECT name FROM sqlite_master WHERE type='table';"
@@ -25,8 +26,9 @@ class HandlerDB:
         else:
             self.database = self.__DATABASE_DATA__
         try:
-            self.banco: Connection = db.connect(f'{self.__ROOT_DIR__}/dataBase/{self.database}')
+            self.banco: Connection = db.connect(Way(self.database, first=True).walk_sys_file())
             self.cursor: Cursor = self.banco.cursor()
+            
         except OperationalError as _erro:
             message: str = f"""Problema ao Conectar com o Banco de dados.\n
                 ->Possivel erro de permissao de leitura/gravacao, 
@@ -34,6 +36,7 @@ class HandlerDB:
                 ERRO:{_erro}"""
             print(message)
             self.ErrConnectDB(message)
+            
 
     def query_add(self, _data: dict[str, str], _table:str=None, contiguos:bool=False) -> str:
         if not _table:
