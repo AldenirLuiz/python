@@ -1,16 +1,17 @@
+# Construct Personalized ttk.TreeView Object
+# Author: Aldenir Luiz 12/03/2023
+
 from tkinter import Tk, Frame
 from tkinter.ttk import Treeview, Style
 from ctypes import Union
 
 class MyTable:
     """
-        Construct Personalized ttk.TreeView Object
-        <author:>Aldenir Luiz 12/03/2023
-
-        <root: required*>master to pack widget
-        <columns: required*>columns names for dispay in top view
-        <width: optional>define max width of widget
-    """
+A classe MyTable tem três atributos de instância: font, style e max_width, 
+estes armazenam a fonte do texto da tabela, o estilo da tabela e a largura máxima da tabela, 
+A classe tem um método __init__ que recebe um objeto Tk, uma lista de nomes de colunas e um valor opcional de largura, e inicializa a instância da classe.
+O método build_view é responsável por criar a tabela. Ele configura o estilo das colunas e adiciona as colunas e os cabeçalhos da tabela. 
+Em seguida, ele adiciona as linhas de dados na tabela e so entao o método retorna a tabela criada."""
     def __init__(self, _root: Tk, _columns: list, _width: int=100, font:tuple=('arial', 12)) -> None:
         self.font:tuple = font
         self.style: Style = Style()

@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import dataHandler
+from SysWay import MyWayApp as Way
 
 class MainView:
     db = dataHandler.HandlerDB(_database='users')
@@ -27,7 +28,7 @@ class MainView:
         self.frame_superior_Direito = dict()
         self.coluna_esquerda = dict()
         self.coluna_direita = dict()
-        self.imagem_prod = PhotoImage(file='pessoa.png')
+        self.imagem_prod = PhotoImage(file=Way('pessoa.png').walk_sys_file())
 
         self.containers_linhas_primarias = {
             'linha_primaria_00' : 
