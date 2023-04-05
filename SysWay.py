@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+
 # Aldenir Luiz 17/02/2023
 import os
-
+import pathlib
 
 class MyWayApp:
     """
@@ -17,41 +17,32 @@ Se o caminho especificado no construtor existir nos diretórios caminhados ele a
 Se nenhum arquivo ou caminho foi encontrado, ele retornará uma lista vazia.
     """
     __ROOT__:str = os.path.dirname(__file__)
+    print(f"MyHome: {__ROOT__}")
     _library:str = 'library.zip'
-    def __init__(self, file:str or bytes=None, path:str=None, onlyWay:bool=False, first:bool=True) -> None:
+    def __init__(self, file:str or bytes=None, path:str=None, onlyWay:bool=False) -> None:
         self.path = path
         self.file = file
         self.option = onlyWay
-        self.first = first
     
-    def walk_sys_file(self) -> list or str:
+    def walk_sys_file(self) -> list:
         my_dirs = list()
         my_files = list()
         for dirs, subdirs, files in os.walk(self.__ROOT__):
             # print(f"dirnames: {dirs}\nsubdirs: {subdirs}\nfiles: {files}")
-
             if self.file and self.file in files:
                 if not self.option:
-                    if self.first:
-                        return f"{dirs}/{self.file}".replace(self._library, '')
-                    else:
-                        my_files.append(f"{dirs}/{self.file}".replace(self._library, ''))
+                    return f"{dirs}/{self.file}".replace(self._library, '')
                 else:
-                   my_files.append(f"{dirs}/".replace(self._library, ''))
+                    return f"{dirs}/".replace(self._library, '')
             elif f"/{self.path}" in dirs:
-                if self.first:
-                    return dirs
-                else:
-                    my_dirs.append(dirs)
+                return dirs
+        return self.__ROOT__
         
-        if self.file:
-            return my_files
-        else:
-            return my_dirs
-        
-            
+
+
 
 if __name__ == '__main__':
     app = MyWayApp(file='dadosCobranca.db')
     print(app.walk_sys_file())
+    
     pass

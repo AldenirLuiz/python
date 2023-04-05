@@ -4,7 +4,7 @@ from SysWay import MyWayApp as Way
 
 
 class ViewCard:
-    json_file: str = Way("cellNames.json").walk_sys_file()
+    json_file: str = Way(file="cellNames.json").walk_sys_file()
     with open(json_file, "r") as cell_names:
         layers = json.load(cell_names)
 

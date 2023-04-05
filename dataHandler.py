@@ -5,7 +5,7 @@ import os
 
 
 class HandlerDB:
-    __ROOT_DIR__: list = Way(path='dataBase', first=False).walk_sys_file()
+    __ROOT_DIR__: list = Way(path='dataBase').walk_sys_file()
     # print(__ROOT_DIR__)
     __DATABASE_DATA__: str = 'dadosCobranca.db'
     __DATABASE_USERS__: str = 'userData.db'
@@ -26,7 +26,9 @@ class HandlerDB:
         else:
             self.database = self.__DATABASE_DATA__
         try:
-            self.banco: Connection = db.connect(Way(self.database, first=True).walk_sys_file())
+            way:str = Way(file=self.database).walk_sys_file()
+            print(f"databaseType: {_database} | path: {way}")
+            self.banco: Connection = db.connect(way)
             self.cursor: Cursor = self.banco.cursor()
             
         except OperationalError as _erro:
