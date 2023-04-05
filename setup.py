@@ -2,9 +2,8 @@
 import tkinter
 import sys
 from cx_Freeze import setup, Executable
-import os, platform
+import os
 
-print(platform.system())
 # Dependencies are automatically detected, but it might need fine tuning.
 build_exe_options = {
     "packages": ["os"], 
@@ -18,13 +17,13 @@ build_exe_options = {
 }
 target = Executable(
     script="main_view.py",
-    base=None,
+    base='Win32GUI',
     icon="app.ico",
 )
 
-base = None
+base = "Console"
 
-setup(  name = "interface",
+setup(  name = "Sistema de Gerenciamento de Dados de Crediario | Corro Variedades",
         version = "1.0",
         description = "Corro Variedades",
         autthor="Aldenir Luiz",
