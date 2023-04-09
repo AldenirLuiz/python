@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, commondialog
 from dataHandler import HandlerDB as Db
 from clockWise import MyClock
 from users_layout import MainView as Users
@@ -30,14 +30,14 @@ class NewView:
         self.window.overrideredirect(False)
         self.window.state('normal')
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
-        self.icon = PhotoImage(file=way('pessoa.png').walk_sys_file())
+        self.icon = PhotoImage(file=way('icone.png').walk_sys_file())
         self.window.iconphoto(True, self.icon)
         self._names = list(self.request_data_users().keys())
         self._routes = list()
         self.text_tables_routes = StringVar(self.window)
         self.text_tables_vendor = StringVar(self.window)
         self.menu = MainMenu(master=self.window, names=self.menu_names)
-        self.frm_primary_rows = Frame(self.window, relief='ridge', bd=2)
+        self.frm_primary_rows = Frame(self.window, relief='ridge', bd=1)
         self.frm_secondary_rows = Frame(self.window,)
         self.frm_primary_rows.pack(side='top', expand=0, fill='x')
         self.frm_secondary_rows.pack(side='bottom', expand=1, fill='both')
@@ -51,31 +51,22 @@ class NewView:
         self.frm_row01_column_00.pack(side='left', expand=1, fill='both')
         self.frm_row01_column_01.pack(side='right', expand=1, fill='both')
         # view quadro geral de rotas
-        self.frm_rw00_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=2) #linha p/ combobox
-        self.frm_rw01_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=2) # linha p/ tabela
+        self.frm_rw00_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=1) #linha p/ combobox
+        self.frm_rw01_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=1) # linha p/ tabela
         self.frm_rw00_cln00.pack(side='top', expand=1, fill='both')
         self.frm_rw01_cln00.pack(side='bottom', expand=1, fill='both')
         # view quadro de visualizacao da planilha
         self.frm_rw00_cln01  = Frame(
             self.frm_row01_column_01, 
-            relief='ridge', bd=2, 
+            relief='ridge', bd=1, 
             width=700, height=800)
-        self.frm_rw00_cln01.pack(expand=0, fill='both')
+        self.frm_rw00_cln01.pack(expand=1, fill='both',padx=2, ipadx=2, pady=2, ipady=2)
         self.label_hist = Label(self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
         self.label_hist.pack(expand=1, fill='x', padx=4, ipadx=4, anchor='n')
         self.label_desc_route = Label(self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         self.combo_values = self.fill_combo()
         self.data = dict()
-
-        self.comands = {
-            'label':[
-                lambda: self.treeview_clicked(None, 'entry'),
-                lambda: PdfGen(None)],
-            'entry':[
-                lambda: self.add_data(self.view.manager()),
-                lambda: PdfGen(self.data)]
-                }
 
         self.combo_vendors = ttk.Combobox( # Combobox Vendedores
             self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
@@ -99,17 +90,69 @@ class NewView:
             _root=self.frm_rw01_cln00,
             _columns=self.list_headers,
             _width=120, font=('arial', 12)) .build_view()
+        self.btt_pack_treeview = Frame(self.frm_rw01_cln00)
+        self.btt_delete = MyButton(
+            self.btt_pack_treeview, _text='Delete', _bg='red', _command=lambda: self.delete_data()
+        )
+        self.btt_manage = MyButton(
+            self.btt_pack_treeview, _text='Editar', _bg='green', _command=lambda: self.edit_data()
+        )
+        self.btt_pack_treeview.pack(side='bottom',expand=1, fill='x', padx=2, pady=0, ipadx=2, ipady=0)
         
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
         self.request_tree(self._names[0])
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.btt_pack = Frame(self.table_frame)
-        self.view = EntryView(self.table_frame, self.data, 'label', self.comands['label']).build()
         self.table_frame.pack(side='top')
 
+        self.comands = {
+            'label':[
+                lambda: self.treeview_clicked(None, 'entry'),
+                lambda: PdfGen(self.get_data())],
+            'entry':[
+                lambda: self.add_data(self.view.manager()),
+                lambda: self.clear_fields()]}
+        
+        self.view = EntryView(self.table_frame, self.data, 'label', self.comands['label']).build()
+
         self.window.mainloop()
+
+class NewViewFunc(NewView):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def pdf_print(self):
+        _data = self.get_data()
+        print(_data)
+        PdfGen(_data)
     
+    def delete_data(self):
+        item = self.main_table.selection()[0]
+        values = self.main_table.item(item, 'values')
+
+        pop_up = messagebox.askquestion(
+            'Deseja Apagar?', 
+            f"""Tem Certeza que quer apagar a planilha definitivamente?
+                Dados a serem apagados: 
+                Rota: {values[0]} 
+                Data da Rota: {values[1].replace(' ','')}
+                Data do Retorno: {values[2].replace(' ','')}""",
+            icon='warning')
+        print(pop_up)
+        if pop_up != 'no':
+            self._handler_db_data.delete_data(
+                values[1].replace(' / ','-'), 
+                values[2].replace(' / ','-'), 
+                values[0])
+            self.request_tree(self.text_tables_vendor.get())
+        else:
+            messagebox.showinfo('Nenhum dado alterado.', 'Comando Cancelado Pelo Usuário! Nenhum dado será apagado.')
+
+
+    def edit_data(self):
+        print('Editar')
+        pass
 
     def request_tree(self, vendor:str):
         data:dict = self._handler_db_data.request_from_vendor(vendor)
@@ -160,16 +203,8 @@ class NewView:
             _type_ = 'label'
         else:
             _type_ = _type
-
         try:
-            item = self.main_table.selection()[0]
-            values = self.main_table.item(item, 'values')
-            data = self._handler_db_data.request_data_from_column(
-                values[1].replace(' / ','-'), 
-                values[2].replace(' / ','-'), 
-                values[0])
-            columns = self._handler_db_data.query_request_columns(values[0])
-            self.data = dict(zip(columns, data[0]))
+            self.data = self.get_data()
         except:
             self.data = dict()
  
@@ -181,6 +216,16 @@ class NewView:
                 _root=self.table_frame, _data=self.data, _type=_type_, 
                 _commands=self.comands[_type_]).build()
         self.table_frame.pack()
+    
+    def get_data(self):
+        item = self.main_table.selection()[0]
+        values = self.main_table.item(item, 'values')
+        data = self._handler_db_data.request_data_from_column(
+            values[1].replace(' / ','-'), 
+            values[2].replace(' / ','-'), 
+            values[0])
+        columns = self._handler_db_data.query_request_columns(values[0])
+        return dict(zip(columns, data[0]))
 
 
     def add_data(self, _data ):
@@ -203,7 +248,11 @@ class NewView:
         except ValueError as _error:
             messagebox.showwarning('showwarning',"Um ERRO ocorreu ao tentar guardar os dados\nVerifique os dados antes de salvar")
         
-
+    def clear_fields(self):
+        for widget in self.view.manager().values():
+            if isinstance(widget, Entry):
+                widget.delete(0, END)
+    
 
 class CalcData:
     def __init__(self, data:dict, last_data=None) -> None:
@@ -213,7 +262,6 @@ class CalcData:
         if last_data:
             self.last_data = last_data
         else:
-            #print(self.last_data)
             if self.data.get('total_vendido').get():
                 if isinstance(self.data.get('total_vendido'), Entry):
                     self.last_data = self.data.get('total_vendido').get()
@@ -262,38 +310,42 @@ class EntryView:
         self.data = _data
         self.type = _type
 
+        if _type == "label":
+            self.names = ['Cadastrar', 'Imprimir']
+        else:
+            self.names = ['Salvar', 'Limpar']
+
     def build(self):
         return MyCards(
             _root= self.root, _data=self.data, 
             _type=self.type, _cards=self.layers, 
-            _subwidget=NewButtons(self.root, _commands=self.comand).build())
+            _subwidget=NewButtons(self.root, _commands=self.comand, _name=self.names).build())
 
 
 class PdfGen:
     def __init__(self, data) -> None:
         self.template = Header(data, None)
         self.template.create_template()
-        webbrowser.open("index.html", new=0)
-        
+        webbrowser.open_new_tab("index.html")
+            
 
 class NewButtons:
-    def __init__(self, root, _commands):
+    def __init__(self, root, _commands, _name):
         self.btt_pack = Frame(root)
-        self.btt_save = MyButton(self.btt_pack, 'Cadastrar', _command=_commands[0])
-        self.btt_print = MyButton(self.btt_pack, 'Imprimir', _command=_commands[1])
+        self.btt_save = MyButton(self.btt_pack, _name[0], _command=_commands[0], _bg='green')
+        self.btt_print = MyButton(self.btt_pack, _name[1], _command=_commands[1], _bg='orange')
     
     def build(self):
         return self.btt_pack
 
 
 class MyButton(Button):
-    def __init__(cls, _root, _text, _command=None) -> None:
-        super().__init__(master=_root, text=_text, command=_command)
+    def __init__(cls, _root, _text, _command=None, _bg=None) -> None:
+        super().__init__(master=_root, text=_text, command=_command, bg=_bg)
         return cls.pack(
             side='left', expand=1, fill='x', 
-            pady=32, padx=32, ipadx=8, ipady=8,
-            anchor='n',)
+            pady=6, padx=6, ipadx=4, ipady=4,)
 
 
 if __name__ == '__main__':
-    NewView()
+    NewViewFunc()

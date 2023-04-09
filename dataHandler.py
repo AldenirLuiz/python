@@ -13,9 +13,9 @@ class HandlerDB:
     _query_table_check: str = "SELECT name FROM sqlite_master WHERE type='table' AND name='{}';"
     _temp_query_columns: str = "PRAGMA table_info({})"
     _request_data_from: str = "SELECT * FROM '{}'"
-    _request_from: str = "SELECT * FROM '{}' WHERE nome_do_vendedor=?;"
-    _request_from_vendor:str = "SELECT * FROM {} WHERE nome_do_vendedor=?;"
+    _request_from_vendor:str =  "SELECT * FROM '{}' WHERE nome_do_vendedor=?;"
     _request_data_with:str = "SELECT * FROM '{}' WHERE data_da_rota LIKE ? AND data_para_retorno=?"
+    _delete_data_from: str = "DELETE FROM '{}' WHERE data_da_rota LIKE ? AND data_para_retorno=?"
 
     _error_code_table: str = "Tabela Inexistente"
 
@@ -84,7 +84,7 @@ class HandlerDB:
             return ['Table not exists', _table]
         
     def request_data_from(self, *args):
-        _data = self.cursor.execute(self._request_from.format(*args)).fetchall()
+        _data = self.cursor.execute(self._request_from_vendor.format(*args)).fetchall()
         return _data
     
     def request_data_from_column(self, _column0, _column1, _table):
@@ -116,28 +116,16 @@ class HandlerDB:
             return True
         else:
             return False
-        
-    @staticmethod
-    def format_table_names(_tables: list[str, str]):
-        temp_names = list()
-        for _table_name in _tables:
-            temp_name = str()
-            temp_date = str()
-            for char in _table_name:
-                if char.isalpha():
-                    temp_name += char
-                elif char.isalnum():
-                    temp_date += char
-                else:
-                    temp_date += '/'
-            temp_names.append(f"{temp_name} - {temp_date}")
-        return temp_names
 
     class ErrConnectDB(Exception):
         pass
 
-    def delete_data(self, _table, _data):
-        pass
+    def delete_data(self, _complement1, _complement2, _table,):
+        query = self.cursor.execute(
+            self._delete_data_from.format(_table), (_complement1, _complement2,)
+        )
+        self.banco.commit()
+        return query
 
 
 if __name__ == "__main__":

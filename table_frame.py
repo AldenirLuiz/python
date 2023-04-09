@@ -1,8 +1,7 @@
-from tkinter import Frame, Button, Toplevel, Entry, END
+from tkinter import Frame
 from mainLayout import Layout as Lay
 from manage import ViewCard
 from dataHandler import HandlerDB as DB
-from pdf_print import Header
 from datetime import datetime, timedelta
 
 
@@ -19,7 +18,6 @@ class MyLayout:
         'total_de_fichas','total_na_rua','venda_anterior',]
 
     def __init__(self, _root, _data=None, _type='label', _cards=None, _subwidget=None) -> None:
-        self.my_cards = ViewCard()
         self.my_cards = ViewCard()
         self.root = _root
         self.data = _data
@@ -38,16 +36,6 @@ class MyLayout:
             self.cards = self.my_cards.layers
         
     
-    def _type(self):
-
-        if self.type_of == 'entry':
-            self.comand = lambda: self.add_data()
-        else:
-            self.comand = lambda: MyCards(
-                _root=self.root,
-                _type='entry', 
-                _data=self.data,)
-
     def manager(self) -> dict:
         return self.widgets_values
 
@@ -56,7 +44,6 @@ class MyCards(MyLayout):
     def __init__(self, _root, _data=None, _type='label', _cards=None, _subwidget=None) -> None:
         super().__init__(_root=_root, _data=_data, _type=_type, _cards=_cards, _subwidget=_subwidget)
         self.my_cards = ViewCard()
-        self._type()
         if _cards:
             self.cards = _cards
         else:
@@ -115,30 +102,4 @@ class MyDateFields:
     def __str__(self) -> str:
         return self.estimate_date.strftime('%d-%m-%y')
 
-
-
-if __name__ == "__main__":
-
-    class RequestData:
-        data_table: dict = dict()
-        _handler = DB(_database='data')
-        def __init__(self, _table) -> None:
-            self.my_table = _table
-            self.data_table: dict = dict(
-                zip(
-                    self._handler.query_request_columns(self.my_table), 
-                    self._handler.request_data(self.my_table)[0]))
-        @classmethod        
-        def dict_val(self) -> dict:
-            return  self.data_table
-
-    from tkinter import Tk, Frame
-    dataf = RequestData('Campina')
-    dict_data= dataf.data_table
-    window = Tk()
-    window.tk_strictMotif(1)
-    frame = Frame(window)
-    frame.pack()
-    view = MyCards(_root=frame, _type='label', _data=dict_data)
-    window.mainloop()
 

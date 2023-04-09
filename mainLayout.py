@@ -9,9 +9,9 @@ class Layout:
     @staticmethod
     def ret_entry(nome: str, pai: Widget):
         widget = Entry(  # configuracoes do Entry
-                pai, width=16, relief='groove', name=nome)
-        widget.grid(  # posicao de alocamento do widget na grade
-                row=1, column=1, padx=2, pady=2, ipadx=2, ipady=2)
+                pai, width=17, relief='groove', name=nome)
+        widget.pack(  # posicao de alocamento do widget na grade
+                side='left', expand=1, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
         return widget
 
     # define o tipo de widget para os dados como do tipo texto
@@ -23,16 +23,15 @@ class Layout:
         widget = Label(  # configuracoes do Label
                 pai, font=font, text=vtext, width=14,
                 relief='flat', name=nome)
-        widget.grid(  # posicao de alocamento na grade
-                row=1, column=1, padx=2, pady=2, ipadx=2, ipady=2)
+        widget.pack(  # posicao de alocamento na grade
+                side='left', expand=1, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
         return widget
 
     # cria um widget opcional (usado para preencher o espaco reservado)
     @staticmethod
     def sub_widget(sb_widget: Widget):
         sb_widget.pack(  # alocando o subwidget na grade
-                side='right', expand=1, fill='both',
-                padx=2, pady=2, ipadx=2, ipady=2)
+                side='right', expand=1, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
 
     # cria o card a receber os widgets
     @staticmethod
@@ -55,8 +54,8 @@ class Layout:
         else: font = ("arial", 12)
         texto_statico = Label(  # configuracoes do Label
                 pai, text=text_var, font=font, width=20, relief='flat', anchor='ne')
-        texto_statico.grid(  # posicao de alocamento do widget na grade
-                row=1, column=0, padx=2, pady=2, ipadx=2, ipady=2)
+        texto_statico.pack(  # posicao de alocamento do widget na grade
+                side='left', expand=1, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
 
     @staticmethod
     def creat_lay(
