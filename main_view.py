@@ -97,6 +97,7 @@ class NewView:
         self.btt_manage = MyButton(
             self.btt_pack_treeview, _text='Editar', _bg='green', _command=lambda: self.edit_data()
         )
+        self.btt_manage.config(state='disabled')
         self.btt_pack_treeview.pack(side='bottom',expand=1, fill='x', padx=2, pady=0, ipadx=2, ipady=0)
         
         self.main_table.bind("<Double-1>", self.treeview_clicked)
