@@ -67,7 +67,8 @@ class Layout:
         subwidget=None,
         data: dict = None,
         font=None,
-        default=None) -> dict:
+        default=None,
+        _exclude:list=None) -> dict:
 
         data_frames: dict = data
             
@@ -88,6 +89,11 @@ class Layout:
                 # filtro de tipo de widget para Entry
                 if type_wid == 'entry':
                     Layout.dictEntryWidget[nome] = Layout.ret_entry(nome=nome, pai=frm1)
+                    if _exclude and nome in _exclude:
+                        Layout.dictEntryWidget[f'{nome}'] = Layout.ret_label(nome=nome, pai=frm1, vtext=None, _font=font)
+                    else:
+                        Layout.dictEntryWidget[f'{nome}'] = Layout.ret_entry(nome=nome, pai=frm1)
+                        
                     if default:
                         if data_frames.get(nome):
                             Layout.dictEntryWidget[f'{nome}'].insert(0, data_frames.get(nome))

@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from dataHandler import HandlerDB as Db
 from clockWise import MyClock
 from users_layout import MainView as Users
@@ -8,14 +8,15 @@ from my_treeview import MyTable
 from table_frame import MyCards
 from manage import ViewCard
 from SysWay import MyWayApp as way
-
+from pdf_print import Header
+import webbrowser
+from datetime import datetime, date
 
 class NewView:
     _handler_db_users = Db(_database='users')
     _handler_db_data = Db(_database='data')
+    _db = _handler_db_data
     list_headers = ['Rota', 'Data', 'Retorno']
-    
-
     menu_names = {
             'Configurações': {
                 'Users': lambda:Users(Toplevel()),
@@ -27,10 +28,10 @@ class NewView:
         self.window = Tk()
         self.window.geometry(f'{self.window.winfo_screenwidth()}x{self.window.winfo_screenheight()}')
         self.window.overrideredirect(False)
-        #self.window.state('withdrawn')
+        self.window.state('normal')
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
-        #self.icon = PhotoImage(file=way('pessoa.png').walk_sys_file())
-        #self.window.iconphoto(True, self.icon)
+        self.icon = PhotoImage(file=way('pessoa.png').walk_sys_file())
+        self.window.iconphoto(True, self.icon)
         self._names = list(self.request_data_users().keys())
         self._routes = list()
         self.text_tables_routes = StringVar(self.window)
@@ -65,8 +66,16 @@ class NewView:
         self.label_desc_route = Label(self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         self.combo_values = self.fill_combo()
-        self.view_cards = ViewCard()
-        self.layers = self.view_cards.layers
+        self.data = dict()
+
+        self.comands = {
+            'label':[
+                lambda: self.treeview_clicked(None, 'entry'),
+                lambda: PdfGen(None)],
+            'entry':[
+                lambda: self.add_data(self.view.manager()),
+                lambda: PdfGen(self.data)]
+                }
 
         self.combo_vendors = ttk.Combobox( # Combobox Vendedores
             self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
@@ -91,20 +100,17 @@ class NewView:
             _columns=self.list_headers,
             _width=120, font=('arial', 12)) .build_view()
         
-
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
         self.request_tree(self._names[0])
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = MyCards(self.table_frame, _type='label')
-        self.table_frame.pack()
-        self.update()
-        
-    def update(self):
-        self.request_tree(self.text_tables_vendor.get())
-        self.window.after(1500, self.update)
+        self.btt_pack = Frame(self.table_frame)
+        self.view = EntryView(self.table_frame, self.data, 'label', self.comands['label']).build()
+        self.table_frame.pack(side='top')
+
         self.window.mainloop()
-        
+    
+
     def request_tree(self, vendor:str):
         data:dict = self._handler_db_data.request_from_vendor(vendor)
         self.combo_routes.delete(0, END)
@@ -149,21 +155,144 @@ class NewView:
         return dictdata
 
 
-    def treeview_clicked(self, event):
+    def treeview_clicked(self, event, _type=None):
+        if _type == None:
+            _type_ = 'label'
+        else:
+            _type_ = _type
+
+        try:
+            item = self.main_table.selection()[0]
+            values = self.main_table.item(item, 'values')
+            data = self._handler_db_data.request_data_from_column(
+                values[1].replace(' / ','-'), 
+                values[2].replace(' / ','-'), 
+                values[0])
+            columns = self._handler_db_data.query_request_columns(values[0])
+            self.data = dict(zip(columns, data[0]))
+        except:
+            self.data = dict()
+ 
         self.table_frame.destroy()
-
-        item = self.main_table.selection()[0]
-        values = self.main_table.item(item, 'values')
-
-        data = self._handler_db_data.request_data_from_column(
-            values[1].replace(' / ','-'), values[2].replace(' / ','-'), values[0])
-        
-        columns = self._handler_db_data.query_request_columns(values[0])
-        _dict_data = dict(zip(columns, data[0]))
-        
         self.table_frame = Frame(self.frm_rw00_cln01)
-        self.view = MyCards(self.table_frame, _data=_dict_data, _type='label', _cards=self.layers)
+        self.btt_pack = Frame(self.table_frame)
+
+        self.view = EntryView(
+                _root=self.table_frame, _data=self.data, _type=_type_, 
+                _commands=self.comands[_type_]).build()
         self.table_frame.pack()
+
+
+    def add_data(self, _data ):
+        try:
+            if _data and _data.get('venda_nova') != None:
+                self.last_value = int(_data.get('venda_nova').get())
+            else:
+                self.last_value = 0
+            data = CalcData(_data, self.last_value).process()
+            if self._db.query_add(data) == "All data are aded":
+                messagebox.showinfo('showinfo',"Os Dados Foram Inseridos\nTudo Ok")
+                print(
+                    f"""                
+                {datetime.strftime(datetime.today(), '%d/%m/%Y %H:%M-%S')} ->
+                Rota Adicionada:
+                {_data.get('nome_da_rota').get()} - {_data.get('data_para_retorno').get()}""")
+                self.request_tree(self.text_tables_vendor.get())
+            else:
+                print('Nenhum dado foi inserido')
+        except ValueError as _error:
+            messagebox.showwarning('showwarning',"Um ERRO ocorreu ao tentar guardar os dados\nVerifique os dados antes de salvar")
+        
+
+
+class CalcData:
+    def __init__(self, data:dict, last_data=None) -> None:
+        self.data = data
+        self.processed_data = dict()
+
+        if last_data:
+            self.last_data = last_data
+        else:
+            #print(self.last_data)
+            if self.data.get('total_vendido').get():
+                if isinstance(self.data.get('total_vendido'), Entry):
+                    self.last_data = self.data.get('total_vendido').get()
+                else: self.last_data = 0
+            else:
+                self.last_data = 0
+
+    def process(self) -> dict:
+        for key in self.data.keys():
+            if isinstance(self.data[key], Entry):
+                self.processed_data.update(
+                    {f'{key}': self.data[key].get()})
+        self.processed_data.update({
+            'data_da_rota': 
+                self.data['data_da_rota'].get().replace('/', '-'),
+            'data_para_retorno': 
+                self.data['data_para_retorno'].get().replace('/', '-'),
+            'total_cobrado': 
+                int(self.data['saldo_cobrado'].get()) + 
+                int(self.data['repasse_cobrado'].get()),
+            'total_vendido': 
+                int(self.last_data) - 
+                int(self.data['devolucao_de_rua'].get()),
+            'total_de_fichas': 
+                int(self.data['fichas_novas'].get()) +
+                int(self.data['fichas_repasse'].get()) +
+                int(self.data['fichas_em_branco'].get()),
+            'entrega_deposito': 
+                int(self.data['compra_deposito'].get()) +
+                int(self.data['devolucao_de_rua'].get()) - (
+                    int(self.data['venda_nova'].get()) +
+                    int(self.data['brindes'].get())),
+            'total_na_rua':
+                int(self.data['venda_nova'].get())+
+                int(self.data['brindes'].get())+
+                int(self.data['vl_fichas_branco'].get()),
+            'venda_anterior': self.last_data})
+        return self.processed_data
+        
+
+class EntryView:
+    def __init__(self, _root, _data, _type, _commands) -> None:
+        self.comand = _commands
+        self.layers = ViewCard().layers
+        self.root = _root
+        self.data = _data
+        self.type = _type
+
+    def build(self):
+        return MyCards(
+            _root= self.root, _data=self.data, 
+            _type=self.type, _cards=self.layers, 
+            _subwidget=NewButtons(self.root, _commands=self.comand).build())
+
+
+class PdfGen:
+    def __init__(self, data) -> None:
+        self.template = Header(data, None)
+        self.template.create_template()
+        webbrowser.open("index.html", new=0)
+        
+
+class NewButtons:
+    def __init__(self, root, _commands):
+        self.btt_pack = Frame(root)
+        self.btt_save = MyButton(self.btt_pack, 'Cadastrar', _command=_commands[0])
+        self.btt_print = MyButton(self.btt_pack, 'Imprimir', _command=_commands[1])
+    
+    def build(self):
+        return self.btt_pack
+
+
+class MyButton(Button):
+    def __init__(cls, _root, _text, _command=None) -> None:
+        super().__init__(master=_root, text=_text, command=_command)
+        return cls.pack(
+            side='left', expand=1, fill='x', 
+            pady=32, padx=32, ipadx=8, ipady=8,
+            anchor='n',)
 
 
 if __name__ == '__main__':
