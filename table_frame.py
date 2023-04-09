@@ -1,4 +1,4 @@
-from tkinter import Frame, Button, Toplevel, Entry, messagebox, END
+from tkinter import Frame, Button, Toplevel, Entry, END
 from mainLayout import Layout as Lay
 from manage import ViewCard
 from dataHandler import HandlerDB as DB
@@ -14,9 +14,13 @@ class MyLayout:
         Construindo Interface da tabela de acordo com os dados contidos no arquivo de configuracao .json
     """
     _db = DB('data')
-    _exclude = ['data da rota', 'retorno']
+    _datefields= ['data da rota', 'retorno']
+    _exclude=[
+        'total_cobrado','total_vendido','entrega_deposito',
+        'total_de_fichas','total_na_rua','venda_anterior',]
 
-    def __init__(self, _root, _data=None, _type='label', _cards=None) -> None:
+    def __init__(self, _root, _data=None, _type='label', _cards=None, _subwidget=None) -> None:
+        self.my_cards = ViewCard()
         self.my_cards = ViewCard()
         self.root = _root
         self.data = _data
@@ -27,7 +31,7 @@ class MyLayout:
         self.last_value = int()
         self.my_child = None
         self.table_frame = Frame(_root)
-        self.process = Process()
+        self.subwidget = _subwidget
 
         if _cards:
             self.cards = _cards
@@ -39,43 +43,25 @@ class MyLayout:
 
         if self.type_of == 'entry':
             self.comand = lambda: self.add_data()
-            self.cards = self.process.exclude_fields()
         else:
-            self.cards = self.my_cards.layers
             self.comand = lambda: MyCards(
-                _root=Toplevel(),
+                _root=self.root,
                 _type='entry', 
                 _data=self.data,)
-            
 
-    def add_data(self):
-        try:
-            if self.data and self.data.get('venda_nova') != None:
-                self.last_value = int(self.data.get('venda_nova'))
-            else:
-                self.last_value = 0
-            data = CalcData(self.widgets_values, self.last_value).process()
-            if self._db.query_add(data) == "All data are aded":
-                self.cards = self.my_cards.layers
-                self.root.destroy()
-                for obj in tree_objects.values():
-                    del obj
-                messagebox.showinfo('showinfo',"Os Dados Foram Inseridos\nTudo Ok")
-            else:
-                print('Nenhum dado foi inserido')
-        except ValueError as _error:
-            messagebox.showwarning('showwarning',"Um ERRO ocorreu ao tentar guardar os dados\nVerifique os dados antes de salvar")
-        
 
     def clear_fields(self):
         for widget in self.widgets_values.values():
             if isinstance(widget, Entry):
                 widget.delete(0, END)
+    
+    def manager(self) -> dict:
+        return self.widgets_values
 
 
 class MyCards(MyLayout):
-    def __init__(self, _root, _data=None, _type='label', _cards=None) -> None:
-        super().__init__(_root=_root, _data=_data, _type=_type, _cards=_cards)
+    def __init__(self, _root, _data=None, _type='label', _cards=None, _subwidget=None) -> None:
+        super().__init__(_root=_root, _data=_data, _type=_type, _cards=_cards, _subwidget=_subwidget)
         self.my_cards = ViewCard()
         self._type()
         if _cards:
@@ -87,111 +73,22 @@ class MyCards(MyLayout):
             self.frm_row = Frame(self.root)
             
             if card != 'celNomesL4':
-                if self.type_of == 'entry' and list(self.cards[card].keys()) == self._exclude:
-                    new_data = NewData(self.data).new_data()
+                if self.type_of == 'entry' and list(self.cards[card].keys()) == self._datefields:
                     self.widgets_values.update(Lay.creat_lay(
-                        self.frm_row, self.cards[card], _type, data=new_data,
-                        font=('arial', 12), default=True))
+                        self.frm_row, self.cards[card], _type, data=NewData(self.data).new_data(),
+                        font=('arial', 12), default=True), _exclude=self._exclude)
                 else:
                     self.widgets_values.update(Lay.creat_lay(
-                        self.frm_row, self.cards[card], self.type_of, data=self.data,
-                        font=('arial', 12)))
+                        pai=self.frm_row, celulas=self.cards[card], type_wid=self.type_of, data=self.data,
+                        font=('arial', 12), _exclude=self._exclude))
             else:
-                self.frm_btt = Frame(self.frm_row)
-                command_button = MyButton(self.frm_btt, 'Cadastrar', self.comand)
-                printer_button = MyButton(self.frm_btt, 'Imprimir', lambda:PdfGen(_data))
-                
                 self.widgets_values.update(Lay.creat_lay(
                     self.frm_row, self.cards[card], self.type_of, 
-                    font=('arial', 12), data=_data, subwidget=self.frm_btt))
-                self.frm_btt.pack()
+                    font=('arial', 12), data=_data, subwidget=self.subwidget, _exclude=self._exclude))
+                #self.subwidget.pack()
+
             self.frm_row.pack(expand=1, fill='both')
         self.table_frame.pack()
-        if _type == 'entry': # requisitando os widgets com dados de entrada
-            printer_button.config(text='Limpar', command=lambda: self.clear_fields())
-        else:
-            command_button.config(command=self.comand)
-
-
-class Process:
-    
-    def __init__(self) -> None:
-        self.exclude=[
-        'total_cobrado','total_vendido','entrega_deposito',
-        'total_de_fichas','total_na_rua','venda_anterior',]
-        self.my_cards = ViewCard()
-        self.temp_cards: dict = dict()
-
-    def exclude_fields(self):
-        self.my_cards = ViewCard()
-        self.temp_cards: dict = dict()
-        self.temp_cards.update(self.my_cards.layers)
-        for cell in self.temp_cards.keys():
-            for card in self.temp_cards[cell]:
-                for value in self.temp_cards[cell][card]:
-                    if value in self.exclude:
-                        self.temp_cards[cell][card].remove(value)
-        return self.temp_cards
-
-    def dict_val(self) -> dict:
-        return self.temp_cards
-
-
-class CalcData:
-    def __init__(self, data:dict, last_data=None) -> dict:
-        self.data = data
-        self.processed_data = dict()
-
-        if last_data:
-            self.last_data = last_data
-        else:
-            #print(self.last_data)
-            if self.data.get('total_vendido'):
-                if isinstance(self.data.get('total_vendido'), Entry):
-                    self.last_data = self.data.get('total_vendido').get()
-                else: self.last_data = 0
-            else:
-                self.last_data = 0
-
-    def process(self):
-        for key in self.data.keys():
-            if isinstance(self.data[key], Entry):
-                self.processed_data.update(
-                    {f'{key}': self.data[key].get()})
-        self.processed_data.update({
-            'data_da_rota': 
-                self.data['data_da_rota'].get().replace('/', '-'),
-            'data_para_retorno': 
-                self.data['data_para_retorno'].get().replace('/', '-'),
-            'total_cobrado': 
-                int(self.data['saldo_cobrado'].get()) + 
-                int(self.data['repasse_cobrado'].get()),
-            'total_vendido': 
-                int(self.last_data) - 
-                int(self.data['devolucao_de_rua'].get()),
-            'total_de_fichas': 
-                int(self.data['fichas_novas'].get()) +
-                int(self.data['fichas_repasse'].get()) +
-                int(self.data['fichas_em_branco'].get()),
-            'entrega_deposito': 
-                int(self.data['compra_deposito'].get()) +
-                int(self.data['devolucao_de_rua'].get()) - (
-                    int(self.data['venda_nova'].get()) +
-                    int(self.data['brindes'].get())),
-            'total_na_rua':
-                int(self.data['venda_nova'].get())+
-                int(self.data['brindes'].get())+
-                int(self.data['vl_fichas_branco'].get()),
-            'venda_anterior': self.last_data})
-        return self.processed_data
-        
-
- 
-class PdfGen:
-    def __init__(self, data) -> None:
-        self.template = Header(data, None)
-        self.template.create_template()
-        webbrowser.open("index.html", new=0)
         
 
 class NewData:
@@ -212,7 +109,7 @@ class NewData:
                 'data_para_retorno': str(MyDateFields(datetime.date(datetime.now())))
                 }
 
-    def new_data(self):
+    def new_data(self) -> dict:
         return self.context
 
 
@@ -225,15 +122,6 @@ class MyDateFields:
     def __str__(self) -> str:
         return self.estimate_date.strftime('%d-%m-%y')
 
-
-
-class MyButton(Button):
-    def __init__(cls, _root, _text, _command=None) -> None:
-        super().__init__(master=_root, text=_text, command=_command)
-        return cls.pack(
-            side='left', expand=1, fill='x', 
-            pady=32, padx=32, ipadx=8, ipady=8,
-            anchor='n',)
 
 
 if __name__ == "__main__":
