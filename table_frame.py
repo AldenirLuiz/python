@@ -4,7 +4,6 @@ from manage import ViewCard
 from dataHandler import HandlerDB as DB
 from pdf_print import Header
 from datetime import datetime, timedelta
-import webbrowser
 
 
 tree_objects = dict()
@@ -49,12 +48,6 @@ class MyLayout:
                 _type='entry', 
                 _data=self.data,)
 
-
-    def clear_fields(self):
-        for widget in self.widgets_values.values():
-            if isinstance(widget, Entry):
-                widget.delete(0, END)
-    
     def manager(self) -> dict:
         return self.widgets_values
 
