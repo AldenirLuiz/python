@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk, messagebox, commondialog
+from tkinter import ttk, messagebox
 from dataHandler import HandlerDB as Db
 from clockWise import MyClock
 from users_layout import MainView as Users
@@ -10,7 +10,8 @@ from manage import ViewCard
 from SysWay import MyWayApp as way
 from pdf_print import Header
 import webbrowser
-from datetime import datetime, date
+from datetime import datetime
+from SysWay import MyWayApp as Way
 
 class NewView:
     _handler_db_users = Db(_database='users')
@@ -25,45 +26,46 @@ class NewView:
                 'About':  lambda: Toplevel().children(Label(text='Aldenir luiz | ╚2023'))}}
     
     def __init__(self) -> None:
+        # Configuracoes primarias da janela principal
         self.window = Tk()
-        self.window.geometry(f'{self.window.winfo_screenwidth()}x{self.window.winfo_screenheight()}')
+        self.window_style = ttk.Style(self.window)
+        self.window_style.configure("BW.TLabel", foreground="black", background="cyan")
+        self.window.geometry(
+            f'{self.window.winfo_screenwidth()}x{self.window.winfo_screenheight()}')
         self.window.overrideredirect(False)
         self.window.state('normal')
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
         self.icon = PhotoImage(file=way('icone.png').walk_sys_file())
         self.window.iconphoto(True, self.icon)
+        # Containers de nomes para rotas e vendedores
         self._names = list(self.request_data_users().keys())
         self._routes = list()
+        # Variavel de estado de selecao na treeview de rotas e vendedores
         self.text_tables_routes = StringVar(self.window)
         self.text_tables_vendor = StringVar(self.window)
+        # objeto Menu
         self.menu = MainMenu(master=self.window, names=self.menu_names)
-        self.frm_primary_rows = Frame(self.window, relief='ridge', bd=1)
-        self.frm_secondary_rows = Frame(self.window,)
-        self.frm_primary_rows.pack(side='top', expand=0, fill='x')
-        self.frm_secondary_rows.pack(side='bottom', expand=1, fill='both')
-        self.frm_labels = Frame(self.frm_primary_rows)
-        self.label_0 = Label(self.frm_labels, text='', anchor='ne', font=('arial', 12), justify='right', width=30)
+        # Containers da linhas primarias e secundarias de widgets
+        self.frm_primary_rows = MyFrame(self.window, 'top', 0)
+        self.frm_secondary_rows = MyFrame(self.window, 'bottom', 1)
+        self.frm_labels = MyFrame(self.frm_primary_rows, None, 0)
+        # Labels primarias e variavel do objeto Relogio
+        self.label_0 = ttk.Label(
+            self.frm_labels, text='', anchor='ne', font=('arial', 12), 
+            justify='right', width=30,)
         self.label_0.pack(side='right', expand=1, fill='x')
         self.clock = MyClock(self.frm_labels, self.label_0)
-        self.frm_labels.pack(expand=0, fill='x')
-        self.frm_row01_column_00 = Frame(self.frm_secondary_rows)
-        self.frm_row01_column_01 = Frame(self.frm_secondary_rows) # side='left'
-        self.frm_row01_column_00.pack(side='left', expand=1, fill='both')
-        self.frm_row01_column_01.pack(side='right', expand=1, fill='both')
-        # view quadro geral de rotas
-        self.frm_rw00_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=1) #linha p/ combobox
-        self.frm_rw01_cln00  = Frame(self.frm_row01_column_00, relief='ridge', bd=1) # linha p/ tabela
-        self.frm_rw00_cln00.pack(side='top', expand=1, fill='both')
-        self.frm_rw01_cln00.pack(side='bottom', expand=1, fill='both')
-        # view quadro de visualizacao da planilha
-        self.frm_rw00_cln01  = Frame(
-            self.frm_row01_column_01, 
-            relief='ridge', bd=1, 
-            width=700, height=800)
-        self.frm_rw00_cln01.pack(expand=1, fill='both',padx=2, ipadx=2, pady=2, ipady=2)
-        self.label_hist = Label(self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
+        # Containers das colunas primarias e secundarias
+        self.frm_row01_column_00 = MyFrame(self.frm_secondary_rows, 'left', 1)
+        self.frm_row01_column_01 = MyFrame(self.frm_secondary_rows, 'right', 1)
+        # Container do quadro de selecao de rotas e vendedores
+        self.frm_rw00_cln00  = MyFrame(self.frm_row01_column_00, 'top', 1) #linha p/ combobox
+        self.frm_rw01_cln00  = MyFrame(self.frm_row01_column_00, 'bottom', 1) # linha p/ tabela
+        # Container do quadro de visualizacao da planilha
+        self.frm_rw00_cln01  = MyFrame(self.frm_row01_column_01, None, 1, _width=700, _height=800)
+        self.label_hist = ttk.Label( master=self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
         self.label_hist.pack(expand=1, fill='x', padx=4, ipadx=4, anchor='n')
-        self.label_desc_route = Label(self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
+        self.label_desc_route = ttk.Label( master=self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         self.combo_values = self.fill_combo()
         self.data = dict()
@@ -75,7 +77,7 @@ class NewView:
             "<<ComboboxSelected>>",
             lambda e: self.request_tree(self.text_tables_vendor.get()))
         self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
-        self.label_desc_vendor = Label(self.frm_rw00_cln00, text='Rota:', font=('arial', 12))
+        self.label_desc_vendor = ttk.Label( master=self.frm_rw00_cln00, text='Rota:', font=('arial', 12))
         self.label_desc_vendor.pack(side='left', padx=4, ipadx=4)
         self.combo_routes = ttk.Combobox( # Combobox Rotas
             self.frm_rw00_cln00, textvariable=self.text_tables_routes, 
@@ -89,8 +91,8 @@ class NewView:
         self.main_table = MyTable(
             _root=self.frm_rw01_cln00,
             _columns=self.list_headers,
-            _width=120, font=('arial', 12)) .build_view()
-        self.btt_pack_treeview = Frame(self.frm_rw01_cln00)
+            _width=120, font=('arial', 12)).build_view()
+        self.btt_pack_treeview = MyFrame(self.frm_rw01_cln00, 'bottom', 1)
         self.btt_delete = MyButton(
             self.btt_pack_treeview, _text='Delete', _bg='red', _command=lambda: self.delete_data()
         )
@@ -98,7 +100,7 @@ class NewView:
             self.btt_pack_treeview, _text='Editar', _bg='green', _command=lambda: self.edit_data()
         )
         self.btt_manage.config(state='disabled')
-        self.btt_pack_treeview.pack(side='bottom',expand=1, fill='x', padx=2, pady=0, ipadx=2, ipady=0)
+        #self.btt_pack_treeview.pack(side='bottom',expand=1, fill='x', padx=2, pady=0, ipadx=2, ipady=0)
         
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
@@ -327,7 +329,8 @@ class PdfGen:
     def __init__(self, data) -> None:
         self.template = Header(data, None)
         self.template.create_template()
-        webbrowser.open_new_tab("index.html")
+        self.browser = webbrowser.get()
+        print(f"Browser: {self.browser}\n{self.browser.open_new_tab(Way(file='index.html').walk_sys_file())}")
             
 
 class NewButtons:
@@ -346,6 +349,12 @@ class MyButton(Button):
         return cls.pack(
             side='left', expand=1, fill='x', 
             pady=6, padx=6, ipadx=4, ipady=4,)
+
+
+class MyFrame(Frame):
+    def __init__(cls, _root, _side, _expand=1, _width=None, _height=None) -> None:
+        super().__init__(master=_root, relief='sunken', bd=1, width=_width, height=_height)
+        return cls.pack(side=_side, expand=_expand, fill='both', ipady=2, ipadx=2)
 
 
 if __name__ == '__main__':
