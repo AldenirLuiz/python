@@ -7,11 +7,10 @@ from main_menu import MainMenu
 from my_treeview import MyTable
 from table_frame import MyCards
 from manage import ViewCard
-from SysWay import MyWayApp as way
+from SysWay import MyWayApp as Way
 from pdf_print import Header
 import webbrowser
 from datetime import datetime
-from SysWay import MyWayApp as Way
 
 class NewView:
     _handler_db_users = Db(_database='users')
@@ -35,7 +34,7 @@ class NewView:
         self.window.overrideredirect(False)
         self.window.state('normal')
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
-        self.icon = PhotoImage(file=way('icone.png').walk_sys_file())
+        self.icon = PhotoImage(file=Way('icone.png').walk_sys_file().replace('library.zip', ''))
         self.window.iconphoto(True, self.icon)
         # Containers de nomes para rotas e vendedores
         self._names = list(self.request_data_users().keys())
@@ -330,7 +329,7 @@ class PdfGen:
         self.template = Header(data, None)
         self.template.create_template()
         self.browser = webbrowser.get()
-        print(f"Browser: {self.browser}\n{self.browser.open_new_tab(Way(file='index.html').walk_sys_file())}")
+        print(f"Browser: {self.browser}\n{self.browser.open_new_tab(Way(file='index.html').walk_sys_file().replace('library.zip', ''))}")
             
 
 class NewButtons:

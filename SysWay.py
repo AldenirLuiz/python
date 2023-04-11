@@ -19,23 +19,27 @@ Se nenhum arquivo ou caminho foi encontrado, ele retornará uma lista vazia.
     __ROOT__:str = os.path.dirname(__file__)
     print(f"MyHome: {__ROOT__}")
     _library:str = 'library.zip'
+    #               library.zip
     def __init__(self, file:str or bytes=None, path:str=None, onlyWay:bool=False) -> None:
         self.path = path
         self.file = file
         self.option = onlyWay
     
     def walk_sys_file(self) -> list:
-        my_dirs = list()
-        my_files = list()
+        if self.file:
+            print(f'Arquivo: {self.file}')
+        else:
+            print(f'NoArquivo: {self.file}')
         for dirs, subdirs, files in os.walk(self.__ROOT__):
             # print(f"dirnames: {dirs}\nsubdirs: {subdirs}\nfiles: {files}")
             if self.file and self.file in files:
+                
                 if not self.option:
-                    return f"{dirs}/{self.file}".replace(self._library, '')
+                    return f"{dirs}/{self.file}".replace('library.zip', '')
                 else:
-                    return f"{dirs}/".replace(self._library, '')
+                    return f"{dirs}/".replace('library.zip', '')
             elif f"/{self.path}" in dirs:
-                return dirs
+                return dirs.replace('library.zip', '')
         return self.__ROOT__
         
 

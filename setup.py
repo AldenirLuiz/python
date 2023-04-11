@@ -3,6 +3,10 @@ import tkinter
 import sys
 from cx_Freeze import setup, Executable
 import os
+import json
+import webbrowser
+
+from datetime import datetime
 
 # Dependencies are automatically detected, but it might need fine tuning.
 build_exe_options = {
