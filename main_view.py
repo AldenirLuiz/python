@@ -11,6 +11,8 @@ from SysWay import MyWayApp as Way
 from pdf_print import Header
 import webbrowser
 from datetime import datetime
+import platform
+
 
 class NewView:
     _handler_db_users = Db(_database='users')
@@ -22,17 +24,22 @@ class NewView:
                 'Users': lambda:Users(Toplevel()),
                 'Sair': lambda:exit(0) },
             'Sobre': {
-                'About':  lambda: Toplevel().children(Label(text='Aldenir luiz | ╚2023'))}}
+                'About':  lambda: AboutMeView()}}
     
     def __init__(self) -> None:
         # Configuracoes primarias da janela principal
         self.window = Tk()
-        self.window_style = ttk.Style(self.window)
-        self.window_style.configure("BW.TLabel", foreground="black", background="cyan")
         self.window.geometry(
             f'{self.window.winfo_screenwidth()}x{self.window.winfo_screenheight()}')
         self.window.overrideredirect(False)
-        self.window.state('normal')
+        
+        if platform.system() == 'Linux':
+            print(f"Plataforma do Sistema: {platform.system()}")
+            self.window.state('normal')
+        else: 
+            print(f"Plataforma do Sistema: {platform.system()}")
+            self.window.state('zoomed')
+            
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
         self.icon = PhotoImage(file=Way('icone.png').walk_sys_file().replace('library.zip', ''))
         self.window.iconphoto(True, self.icon)
@@ -49,7 +56,7 @@ class NewView:
         self.frm_secondary_rows = MyFrame(self.window, 'bottom', 1)
         self.frm_labels = MyFrame(self.frm_primary_rows, None, 0)
         # Labels primarias e variavel do objeto Relogio
-        self.label_0 = ttk.Label(
+        self.label_0 = Label(
             self.frm_labels, text='', anchor='ne', font=('arial', 12), 
             justify='right', width=30,)
         self.label_0.pack(side='right', expand=1, fill='x')
@@ -62,9 +69,9 @@ class NewView:
         self.frm_rw01_cln00  = MyFrame(self.frm_row01_column_00, 'bottom', 1) # linha p/ tabela
         # Container do quadro de visualizacao da planilha
         self.frm_rw00_cln01  = MyFrame(self.frm_row01_column_01, None, 1, _width=700, _height=800)
-        self.label_hist = ttk.Label( master=self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
+        self.label_hist = Label( master=self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
         self.label_hist.pack(expand=1, fill='x', padx=4, ipadx=4, anchor='n')
-        self.label_desc_route = ttk.Label( master=self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
+        self.label_desc_route = Label( master=self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
         self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         self.combo_values = self.fill_combo()
         self.data = dict()
@@ -76,7 +83,7 @@ class NewView:
             "<<ComboboxSelected>>",
             lambda e: self.request_tree(self.text_tables_vendor.get()))
         self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
-        self.label_desc_vendor = ttk.Label( master=self.frm_rw00_cln00, text='Rota:', font=('arial', 12))
+        self.label_desc_vendor = Label( master=self.frm_rw00_cln00, text='Rota:', font=('arial', 12))
         self.label_desc_vendor.pack(side='left', padx=4, ipadx=4)
         self.combo_routes = ttk.Combobox( # Combobox Rotas
             self.frm_rw00_cln00, textvariable=self.text_tables_routes, 
@@ -104,9 +111,8 @@ class NewView:
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
         self.request_tree(self._names[0])
-        self.table_frame = Frame(self.frm_rw00_cln01)
+        self.table_frame = MyFrame(self.frm_rw00_cln01, 'top', 1)
         self.btt_pack = Frame(self.table_frame)
-        self.table_frame.pack(side='top')
 
         self.comands = {
             'label':[
@@ -211,22 +217,22 @@ class NewViewFunc(NewView):
             self.data = dict()
  
         self.table_frame.destroy()
-        self.table_frame = Frame(self.frm_rw00_cln01)
-        self.btt_pack = Frame(self.table_frame)
+        self.table_frame = MyFrame(self.frm_rw00_cln01, None, 1)
+        self.btt_pack = MyFrame(self.table_frame, None, 1)
 
         self.view = EntryView(
                 _root=self.table_frame, _data=self.data, _type=_type_, 
                 _commands=self.comands[_type_]).build()
         self.table_frame.pack()
     
-    def get_data(self):
-        item = self.main_table.selection()[0]
-        values = self.main_table.item(item, 'values')
+    def get_data(self) -> dict:
+        item: str = self.main_table.selection()[0]
+        values: tuple = self.main_table.item(item, 'values')
         data = self._handler_db_data.request_data_from_column(
             values[1].replace(' / ','-'), 
             values[2].replace(' / ','-'), 
             values[0])
-        columns = self._handler_db_data.query_request_columns(values[0])
+        columns: list = self._handler_db_data.query_request_columns(values[0])
         return dict(zip(columns, data[0]))
 
 
@@ -311,7 +317,6 @@ class EntryView:
         self.root = _root
         self.data = _data
         self.type = _type
-
         if _type == "label":
             self.names = ['Cadastrar', 'Imprimir']
         else:
@@ -354,6 +359,31 @@ class MyFrame(Frame):
     def __init__(cls, _root, _side, _expand=1, _width=None, _height=None) -> None:
         super().__init__(master=_root, relief='sunken', bd=1, width=_width, height=_height)
         return cls.pack(side=_side, expand=_expand, fill='both', ipady=2, ipadx=2)
+
+
+class AboutMeView(Toplevel):
+    licences: str = str()
+    with open(
+        Way(file='licence.md').walk_sys_file().replace('library.zip', 
+        'licence.md'), 'r', encoding='utf8') as _licence:
+        licences: str = _licence.read()
+    
+    _buttons_names: list = ['Meu Perfil', 'Sair']
+    _desc_label: str = ['Sistema de Gerenciamento de Crediario', 'Copyright ©Aldenir Luiz']
+    def __init__(cls) -> None:
+        super().__init__(relief='sunken', bd=1, padx=4, pady=4)
+        cls._comands: list = [lambda:webbrowser.open('https://github.com/AldenirLuiz'), lambda: cls.destroy()]
+        cls.frameview = MyFrame(cls, None, 1)
+        cls.label_desc = Label(cls.frameview, text=cls._desc_label[0], font=('arial', 16, 'bold'), justify='center')
+        cls.label_desc.pack(expand=1, fill='both', padx=4, pady=4, ipadx=4, ipady=4)
+        cls.label = Label(cls.frameview, text=cls.licences, font=('consolas', 14), justify='left')
+        cls.label.pack(expand=1, fill='both', padx=4, pady=4, ipadx=4, ipady=4)
+        cls.label_author = Label(cls.frameview, text=cls._desc_label[1], font=('arial', 16, 'bold'), justify='left', anchor='ne')
+        cls.label_author.pack(expand=1, fill='both', padx=4, pady=4, ipadx=4, ipady=4, anchor='ne')
+        cls.framebtt = MyFrame(cls, 'bottom', 1)
+        cls.btt_exit = NewButtons(root=cls.framebtt, _commands=cls._comands, _name=cls._buttons_names)
+        cls.btt_exit.btt_pack.pack(expand=1, fill='both', padx=4, pady=4, ipadx=4, ipady=4, anchor='e')
+        
 
 
 if __name__ == '__main__':

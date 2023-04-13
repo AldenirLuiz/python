@@ -28,11 +28,11 @@ Em seguida, ele adiciona as linhas de dados na tabela e so entao o método retor
             show='headings',
             ); self.build_view(),
             
-
-    def build_view(self):
+            
+    def build_view(self) -> Treeview:
         self.style.configure("Treeview.Heading", font=self.font_bold)
         self.style.configure("Treeview", font=self.font)
-        index_count = 0
+        index_count: int = 0
         for column_name in self.columns:
             self.main_table.column(
                 column_name, minwidth=50, width=self.max_width, anchor='n'
