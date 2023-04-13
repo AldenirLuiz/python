@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Frame, Label, Toplevel, PhotoImage, StringVar, END, Entry, Button
 from tkinter import ttk, messagebox
 from dataHandler import HandlerDB as Db
 from clockWise import MyClock
@@ -7,12 +7,11 @@ from main_menu import MainMenu
 from my_treeview import MyTable
 from table_frame import MyCards
 from manage import ViewCard
-from SysWay import MyWayApp as Way
+from SysWay import MyWayApp as way
 from pdf_print import Header
 import webbrowser
 from datetime import datetime
-import platform
-
+from SysWay import MyWayApp as Way
 
 class NewView:
     _handler_db_users = Db(_database='users')
@@ -24,25 +23,21 @@ class NewView:
                 'Users': lambda:Users(Toplevel()),
                 'Sair': lambda:exit(0) },
             'Sobre': {
-                'About':  lambda: AboutMeView()}}
+                'About': lambda: AboutMeView()}}
     
     def __init__(self) -> None:
         # Configuracoes primarias da janela principal
         self.window = Tk()
+        self.window_style = ttk.Style(self.window)
+        self.window_style.configure("BW.TLabel", foreground="black", background="cyan")
         self.window.geometry(
             f'{self.window.winfo_screenwidth()}x{self.window.winfo_screenheight()}')
         self.window.overrideredirect(False)
-        
-        if platform.system() == 'Linux':
-            print(f"Plataforma do Sistema: {platform.system()}")
-            self.window.state('normal')
-        else: 
-            print(f"Plataforma do Sistema: {platform.system()}")
-            self.window.state('zoomed')
-            
+        self.window.state('normal')
         self.window.title('Gerenciamento de Dados de Crediario - Corró Variedades')
-        self.icon = PhotoImage(file=Way('icone.png').walk_sys_file().replace('library.zip', ''))
+        self.icon = PhotoImage(file=way('icone.png').walk_sys_file())
         self.window.iconphoto(True, self.icon)
+
         # Containers de nomes para rotas e vendedores
         self._names = list(self.request_data_users().keys())
         self._routes = list()
@@ -68,51 +63,37 @@ class NewView:
         self.frm_rw00_cln00  = MyFrame(self.frm_row01_column_00, 'top', 1) #linha p/ combobox
         self.frm_rw01_cln00  = MyFrame(self.frm_row01_column_00, 'bottom', 1) # linha p/ tabela
         # Container do quadro de visualizacao da planilha
-        self.frm_rw00_cln01  = MyFrame(self.frm_row01_column_01, None, 1, _width=700, _height=800)
+        self.frm_rw00_cln01  = MyFrame(self.frm_row01_column_01, None, 1)
         self.label_hist = Label( master=self.frm_rw00_cln00, text='Corro Variedades', font=('times new roman', 52))
         self.label_hist.pack(expand=1, fill='x', padx=4, ipadx=4, anchor='n')
-        self.label_desc_route = Label( master=self.frm_rw00_cln00, text='Vendedor:', font=('arial', 12))
-        self.label_desc_route.pack(side='left', padx=4, ipadx=4)
         self.combo_values = self.fill_combo()
         self.data = dict()
 
-        self.combo_vendors = ttk.Combobox( # Combobox Vendedores
-            self.frm_rw00_cln00, textvariable=self.text_tables_vendor, 
-            values=self.combo_values)
-        self.combo_vendors.bind(
-            "<<ComboboxSelected>>",
-            lambda e: self.request_tree(self.text_tables_vendor.get()))
-        self.combo_vendors.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
-        self.label_desc_vendor = Label( master=self.frm_rw00_cln00, text='Rota:', font=('arial', 12))
-        self.label_desc_vendor.pack(side='left', padx=4, ipadx=4)
-        self.combo_routes = ttk.Combobox( # Combobox Rotas
-            self.frm_rw00_cln00, textvariable=self.text_tables_routes, 
-            values=self._routes,
-            exportselection=True)
-        self.combo_routes.bind(
-            "<<ComboboxSelected>>", 
-            lambda e: self.treeview_data(self.text_tables_routes.get())
-        )
-        self.combo_routes.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
+        self.combo_vendors = MyCombo( # Combobox Vendedores 
+            _root=self.frm_rw00_cln00, _textVar=self.text_tables_vendor,
+            _textExib='Vendedor:', _values=self.combo_values, object=self.request_tree)
+        self.combo_routes = MyCombo( # Combobox rotas
+            _root=self.frm_rw00_cln00, _textVar=self.text_tables_routes,
+            _textExib='Rota:', _values=self._routes, object=self.treeview_data)
+       
         self.main_table = MyTable(
             _root=self.frm_rw01_cln00,
             _columns=self.list_headers,
             _width=120, font=('arial', 12)).build_view()
+        
         self.btt_pack_treeview = MyFrame(self.frm_rw01_cln00, 'bottom', 1)
         self.btt_delete = MyButton(
-            self.btt_pack_treeview, _text='Delete', _bg='red', _command=lambda: self.delete_data()
-        )
+            self.btt_pack_treeview, _text='Delete', _bg='red', _command=lambda: self.delete_data())
         self.btt_manage = MyButton(
-            self.btt_pack_treeview, _text='Editar', _bg='green', _command=lambda: self.edit_data()
-        )
+            self.btt_pack_treeview, _text='Editar', _bg='green', _command=lambda: self.edit_data())
         self.btt_manage.config(state='disabled')
-        #self.btt_pack_treeview.pack(side='bottom',expand=1, fill='x', padx=2, pady=0, ipadx=2, ipady=0)
         
         self.main_table.bind("<Double-1>", self.treeview_clicked)
         self.combo_vendors.insert('end', self._names[0])
         self.request_tree(self._names[0])
-        self.table_frame = MyFrame(self.frm_rw00_cln01, 'top', 1)
+        self.table_frame = Frame(self.frm_rw00_cln01)
         self.btt_pack = Frame(self.table_frame)
+        self.table_frame.pack(side='top')
 
         self.comands = {
             'label':[
@@ -125,6 +106,7 @@ class NewView:
         self.view = EntryView(self.table_frame, self.data, 'label', self.comands['label']).build()
 
         self.window.mainloop()
+
 
 class NewViewFunc(NewView):
     def __init__(self) -> None:
@@ -217,22 +199,22 @@ class NewViewFunc(NewView):
             self.data = dict()
  
         self.table_frame.destroy()
-        self.table_frame = MyFrame(self.frm_rw00_cln01, None, 1)
-        self.btt_pack = MyFrame(self.table_frame, None, 1)
+        self.table_frame = Frame(self.frm_rw00_cln01)
+        self.btt_pack = Frame(self.table_frame)
 
         self.view = EntryView(
                 _root=self.table_frame, _data=self.data, _type=_type_, 
                 _commands=self.comands[_type_]).build()
         self.table_frame.pack()
     
-    def get_data(self) -> dict:
-        item: str = self.main_table.selection()[0]
-        values: tuple = self.main_table.item(item, 'values')
+    def get_data(self):
+        item = self.main_table.selection()[0]
+        values = self.main_table.item(item, 'values')
         data = self._handler_db_data.request_data_from_column(
             values[1].replace(' / ','-'), 
             values[2].replace(' / ','-'), 
             values[0])
-        columns: list = self._handler_db_data.query_request_columns(values[0])
+        columns = self._handler_db_data.query_request_columns(values[0])
         return dict(zip(columns, data[0]))
 
 
@@ -317,6 +299,7 @@ class EntryView:
         self.root = _root
         self.data = _data
         self.type = _type
+
         if _type == "label":
             self.names = ['Cadastrar', 'Imprimir']
         else:
@@ -334,7 +317,7 @@ class PdfGen:
         self.template = Header(data, None)
         self.template.create_template()
         self.browser = webbrowser.get()
-        print(f"Browser: {self.browser}\n{self.browser.open_new_tab(Way(file='index.html').walk_sys_file().replace('library.zip', ''))}")
+        print(f"Browser: {self.browser}\n{self.browser.open_new_tab(Way(file='index.html').walk_sys_file())}")
             
 
 class NewButtons:
@@ -361,6 +344,25 @@ class MyFrame(Frame):
         return cls.pack(side=_side, expand=_expand, fill='both', ipady=2, ipadx=2)
 
 
+class MyCombo(ttk.Combobox): # Combobox para definir o filtro de pesquisa dentro do treeview
+    def __init__(cls, _root, _textVar, _textExib, _values, **kwargs):
+        super().__init__(master=_root, textvariable=_textVar, values=_values)
+
+        cls.master = _root
+        cls.object: \
+            ttk.Treeview|None = kwargs.get('object') # objeto (TreeView) que exibe os dados a serem filtrados
+        cls.text_var: StringVar = _textVar
+
+        cls.label_desc_vendor = Label( master=cls.master, text=_textExib, font=('arial', 12))
+        cls.label_desc_vendor.pack(side='left', padx=4, ipadx=4)
+
+        cls.bind( # configuracao do comando de selecao
+            "<<ComboboxSelected>>",
+            lambda e: cls.object(cls.text_var.get()))
+        
+        return cls.pack(side='left', padx=4, pady=4, ipadx=4, ipady=4)
+
+
 class AboutMeView(Toplevel):
     licences: str = str()
     with open(
@@ -383,7 +385,6 @@ class AboutMeView(Toplevel):
         cls.framebtt = MyFrame(cls, 'bottom', 1)
         cls.btt_exit = NewButtons(root=cls.framebtt, _commands=cls._comands, _name=cls._buttons_names)
         cls.btt_exit.btt_pack.pack(expand=1, fill='both', padx=4, pady=4, ipadx=4, ipady=4, anchor='e')
-        
 
 
 if __name__ == '__main__':
