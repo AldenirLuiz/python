@@ -93,7 +93,7 @@ class NewView:
         self.request_tree(self._names[0])
         self.table_frame = Frame(self.frm_rw00_cln01)
         self.btt_pack = Frame(self.table_frame)
-        self.table_frame.pack(side='top')
+        self.table_frame.pack(side='top', expand=1, fill='both')
 
         self.comands = {
             'label':[
@@ -103,7 +103,8 @@ class NewView:
                 lambda: self.add_data(self.view.manager()),
                 lambda: self.clear_fields()]}
         
-        self.view = EntryView(self.table_frame, self.data, 'label', self.comands['label']).build()
+        self.view = EntryView(_root=self.table_frame, _data=self.data, _type='label', _commands=self.comands['label'])
+        self.view.build()
 
         self.window.mainloop()
 
@@ -294,11 +295,12 @@ class CalcData:
 
 class EntryView:
     def __init__(self, _root, _data, _type, _commands) -> None:
-        self.comand = _commands
-        self.layers = ViewCard().layers
+        
         self.root = _root
         self.data = _data
         self.type = _type
+        self.comand = _commands
+        self.layers = ViewCard().layers
 
         if _type == "label":
             self.names = ['Cadastrar', 'Imprimir']

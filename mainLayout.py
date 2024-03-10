@@ -7,24 +7,24 @@ class Layout:
 
     # define o tipo de widget para os dados como do tipo entrada
     @staticmethod
-    def ret_entry(name: str, root: Widget | Frame, _font: tuple | None=None):
+    def ret_entry(name: str, _root: Widget | Frame, _font: tuple | None=None):
         if _font:
             font: tuple = _font
         else: font: tuple = ("arial", 12)
         widget = Entry(  # configuracoes do Entry
-                root, width=21, relief='groove', name=name)
+                _root, width=21, relief='groove', name=name)
         widget.pack(  # posicao de alocamento do widget na grade
                 side='left', expand=0, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
         return widget
 
     # define o tipo de widget para os dados como do tipo texto
     @staticmethod
-    def ret_label(name: str, root: Widget | Frame, vtext: str, _font: tuple | None=None):
+    def ret_label(name: str, _root: Widget | Frame, vtext: str, _font: tuple | None=None):
         if _font:
             font = _font
         else: font = ("arial", 12)
         widget = Label(  # configuracoes do Label
-                root, font=font, text=vtext, width=16,
+                _root, font=font, text=vtext, width=16,
                 relief='flat', name=name)
         widget.pack(  # posicao de alocamento na grade
                 side='left', expand=0, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
@@ -38,32 +38,31 @@ class Layout:
 
     # cria o card a receber os widgets
     @staticmethod
-    def create_card(root: Widget | Frame, desc: str):
+    def create_card(_root: Widget | Frame, desc: str):
         # container de disposicao da grade frm0
-        label = Label(root, text=desc.upper(), relief='groove')
+        label = Label(_root, text=desc.upper(), relief='groove')
         label.pack(expand=1, fill='x')
 
     # cria uma tarja de descricao acima do card quando solicitado
     @staticmethod
-    def desc_widget(root: Widget | Frame, descricao: str):
-        label_cobranca = Label(root, text=descricao.upper(), anchor='center')
+    def desc_widget(_root: Widget | Frame, descricao: str):
+        label_cobranca = Label(_root, text=descricao.upper(), anchor='center')
         label_cobranca.pack()
 
     # cria o texto a ser exibido ao lado do widget de dados
     @staticmethod
-    def ret_static_var(root: Widget | Frame, text_var: str, _font: tuple | None=None):
+    def ret_static_var(_root: Widget | Frame, text_var: str, _font: tuple | None=None):
         if _font:
             font = _font
         else: font = ("arial", 12)
         texto_statico = Label(  # configuracoes do Label
-                root, text=text_var, font=font, width=20, relief='flat', anchor='ne')
+                _root, text=text_var, font=font, width=20, relief='flat', anchor='ne')
         texto_statico.pack(  # posicao de alocamento do widget na grade
                 side='left', expand=1, fill='both', padx=2, pady=2, ipadx=2, ipady=2)
 
     @staticmethod
-    def creat_lay(*args, **misc) -> dict:
-        """root:tk.Frame|tk.Widget, desc:str|bytes, subwidget:tk.Frame|tk.Widget"""
-        root, celulas, type_wid = args
+    def creat_lay(_root, celulas, type_wid, **misc) -> dict:
+        """_root:tk.Frame|tk.Widget, desc:str|bytes, subwidget:tk.Frame|tk.Widget"""
         desc:str|bytes|None = misc.get('desc')
         subwidget: Frame|Widget|None = misc.get('subwidget')
         data: dict|None = misc.get('data')
@@ -74,7 +73,7 @@ class Layout:
             
         #  percorre as celulas presentes no pacote
         for desc, celula in celulas.items():
-            frm0 = Frame(root, relief='groove', bd=2)
+            frm0 = Frame(_root, relief='groove', bd=2)
             Layout.create_card(frm0, desc)
             # percorre os widgets presentes no pacote
             for widget in celula:
@@ -91,15 +90,15 @@ class Layout:
                 
                 if type_wid == 'entry': # filtro de tipo de widget para Entry
                     Layout.dictEntryWidget[name] = \
-                        Layout.ret_entry(name=name, root=frm1, _font=font)
+                        Layout.ret_entry(name=name, _root=frm1, _font=font)
                     
                     if _exclude and name in _exclude:
                         Layout.dictEntryWidget[f'{name}'] = \
                             Layout.ret_label(
-                                name=name, root=frm1, vtext=None, _font=font)
+                                name=name, _root=frm1, vtext=None, _font=font)
                     else:
                         Layout.dictEntryWidget[f'{name}'] = \
-                            Layout.ret_entry(name=name, root=frm1, _font=font)
+                            Layout.ret_entry(name=name, _root=frm1, _font=font)
                         
                     if default:
                         if data.get(name):
@@ -108,7 +107,7 @@ class Layout:
                 else:  # filtro de tipo de widget para Label
                     Layout.dictEntryWidget[f'{name}'] = \
                         Layout.ret_label(
-                            name=name, root=frm1, vtext=data_names, _font=font
+                            name=name, _root=frm1, vtext=data_names, _font=font
                         )
                 frm1.pack( # alocando do container da grade
                     anchor='w', expand=1, fill='both', padx=2, pady=1, ipadx=2, ipady=1)

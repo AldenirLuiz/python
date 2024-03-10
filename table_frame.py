@@ -59,7 +59,7 @@ class MyCards(MyLayout):
                         font=('arial', 12), default=True), _exclude=self._exclude)
                 else:
                     self.widgets_values.update(Lay.creat_lay(
-                        pai=self.frm_row, celulas=self.cards[card], type_wid=self.type_of, data=self.data,
+                        _root=self.frm_row, celulas=self.cards[card], type_wid=self.type_of, data=self.data,
                         font=('arial', 12), _exclude=self._exclude))
             else:
                 self.widgets_values.update(Lay.creat_lay(
@@ -68,7 +68,7 @@ class MyCards(MyLayout):
                 #self.subwidget.pack()
 
             self.frm_row.pack(expand=1, fill='both')
-        self.table_frame.pack()
+        self.table_frame.pack(expand=1, fill='both')
         
 
 class NewData:
