@@ -120,4 +120,4 @@ class Layout:
         # retorna os widgets configurados e enpacotados para uso
         return Layout.dictEntryWidget
     
-    
+     
